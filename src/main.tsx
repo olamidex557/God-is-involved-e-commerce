@@ -1,13 +1,27 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
 
-import { router } from "./routes/router";
+import { BrowserRouter } from "react-router-dom";
+
+import { Toaster } from "react-hot-toast";
+
+import App from "./App";
 
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(
+  document.getElementById("root")!
+).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <BrowserRouter>
+      <App />
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+    </BrowserRouter>
   </React.StrictMode>
 );

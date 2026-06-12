@@ -18,6 +18,9 @@ import {
   useCartStore,
 } from "../../store/cartStore";
 
+import toast
+  from "react-hot-toast";
+
 const Product = () => {
   const { id } =
     useParams();
@@ -80,7 +83,7 @@ const Product = () => {
               <img
                 src={
                   product.images?.[
-                    activeImage
+                  activeImage
                   ] ||
                   "https://picsum.photos/1000"
                 }
@@ -124,11 +127,10 @@ const Product = () => {
                       rounded-xl
                       overflow-hidden
                       border
-                      ${
-                        activeImage ===
+                      ${activeImage ===
                         index
-                          ? "border-[#D4AF37]"
-                          : "border-white/10"
+                        ? "border-[#D4AF37]"
+                        : "border-white/10"
                       }
                     `}
                   >
@@ -224,19 +226,20 @@ const Product = () => {
               "
             >
               <Button
-                onClick={() =>
+                onClick={() => {
                   addToCart({
                     id: product._id,
-                    name:
-                      product.name,
-                    price:
-                      product.price,
+                    name: product.name,
+                    price: product.price,
                     image:
-                      product
-                        .images?.[0],
+                      product.images?.[0],
                     quantity: 1,
-                  })
-                }
+                  });
+
+                  toast.success(
+                    `${product.name} added to cart`
+                  );
+                }}
               >
                 Add To Cart
               </Button>

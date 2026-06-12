@@ -1,27 +1,31 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface CartItem {
+interface CartItem {
   id: string;
   name: string;
-  image?: string;
   price: number;
+  image?: string;
   quantity: number;
 }
 
 interface CartStore {
   items: CartItem[];
 
-  addItem: (item: CartItem) => void;
+  addItem: (
+    item: CartItem
+  ) => void;
 
-  removeItem: (id: string) => void;
-
-  clearCart: () => void;
+  removeItem: (
+    id: string
+  ) => void;
 
   updateQuantity: (
     id: string,
     quantity: number
   ) => void;
+
+  clearCart: () => void;
 }
 
 export const useCartStore =
@@ -30,25 +34,29 @@ export const useCartStore =
       (set) => ({
         items: [],
 
-        addItem: (item) =>
+        addItem: (
+          item
+        ) =>
           set((state) => {
             const existing =
               state.items.find(
-                (i) => i.id === item.id
+                (i) =>
+                  i.id === item.id
               );
 
             if (existing) {
               return {
                 items:
-                  state.items.map((i) =>
-                    i.id === item.id
-                      ? {
-                          ...i,
-                          quantity:
-                            i.quantity +
-                            item.quantity,
-                        }
-                      : i
+                  state.items.map(
+                    (i) =>
+                      i.id === item.id
+                        ? {
+                            ...i,
+                            quantity:
+                              i.quantity +
+                              1,
+                          }
+                        : i
                   ),
               };
             }
@@ -61,7 +69,9 @@ export const useCartStore =
             };
           }),
 
-        removeItem: (id) =>
+        removeItem: (
+          id
+        ) =>
           set((state) => ({
             items:
               state.items.filter(
@@ -70,32 +80,31 @@ export const useCartStore =
               ),
           })),
 
-        clearCart: () =>
-          set({
-            items: [],
-          }),
-
         updateQuantity: (
           id,
           quantity
         ) =>
           set((state) => ({
             items:
-              state.items.map((item) =>
-                item.id === id
-                  ? {
-                      ...item,
-                      quantity:
-                        quantity < 1
-                          ? 1
-                          : quantity,
-                    }
-                  : item
+              state.items.map(
+                (item) =>
+                  item.id === id
+                    ? {
+                        ...item,
+                        quantity,
+                      }
+                    : item
               ),
           })),
+
+        clearCart: () =>
+          set({
+            items: [],
+          }),
       }),
       {
-        name: "god-is-involved-cart",
+        name:
+          "god-is-involved-cart",
       }
     )
   );

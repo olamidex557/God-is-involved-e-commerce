@@ -14,8 +14,9 @@ import Contact from "../pages/Contact";
 import Orders from "../pages/Orders";
 import Profile from "../pages/Profile";
 import OrderSuccess from "../pages/OrderSuccess";
-
 import Dashboard from "../pages/Dashboard";
+
+import ProductsAdmin from "../pages/admin/Products";
 
 export const router = createBrowserRouter([
   {
@@ -72,6 +73,10 @@ export const router = createBrowserRouter([
       {
         path: "/order-success",
         element: <OrderSuccess />,
+      },
+      {
+        path: "/admin/products",
+        element: <ProductsAdmin />,
       },
     ],
   },

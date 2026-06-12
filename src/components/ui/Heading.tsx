@@ -6,7 +6,17 @@ interface HeadingProps {
 
 const Heading = ({ children }: HeadingProps) => {
   return (
-    <h1 className="text-5xl md:text-7xl font-bold leading-[0.95] tracking-tight">
+    <h1
+      className="
+      text-4xl
+      sm:text-5xl
+      md:text-6xl
+      lg:text-7xl
+      font-bold
+      leading-[0.95]
+      tracking-tight
+      "
+    >
       {children}
     </h1>
   );

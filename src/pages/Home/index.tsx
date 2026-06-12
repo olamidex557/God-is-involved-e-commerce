@@ -35,7 +35,7 @@ const Home = () => {
       >
         <Container>
           <div className="max-w-5xl">
-            <p className="text-[#D4AF37] uppercase tracking-[0.4em] mb-6">
+            <p className="text-[#D4AF37] uppercase tracking-[0.3em] mb-6 text-sm md:text-base">
               Premium Building Materials
             </p>
 
@@ -49,12 +49,12 @@ const Home = () => {
               REMEMBER.
             </Heading>
 
-            <p className="text-xl text-white/70 mt-8 max-w-2xl leading-8">
+            <p className="text-base md:text-xl text-white/70 mt-8 max-w-2xl leading-8">
               Premium plywood, MDF, HDF,
               furniture accessories and interior materials.
             </p>
 
-            <div className="flex gap-4 mt-12">
+            <div className="flex flex-col sm:flex-row gap-4 mt-12">
               <Button>
                 Explore Materials
               </Button>
@@ -71,17 +71,24 @@ const Home = () => {
 
       <Section>
         <Container>
-          <div className="mb-20">
-            <h2 className="text-6xl font-bold">
+          <div className="mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold">
               Featured Projects
             </h2>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div>
               <img
                 src={kitchen}
-                className="h-[500px] w-full object-cover rounded-[32px]"
+                alt=""
+                className="
+                h-[350px]
+                md:h-[500px]
+                w-full
+                object-cover
+                rounded-[32px]
+                "
               />
 
               <h3 className="mt-6 text-2xl font-bold">
@@ -92,7 +99,14 @@ const Home = () => {
             <div>
               <img
                 src={wardrobe}
-                className="h-[500px] w-full object-cover rounded-[32px]"
+                alt=""
+                className="
+                h-[350px]
+                md:h-[500px]
+                w-full
+                object-cover
+                rounded-[32px]
+                "
               />
 
               <h3 className="mt-6 text-2xl font-bold">
@@ -103,7 +117,14 @@ const Home = () => {
             <div>
               <img
                 src={office}
-                className="h-[500px] w-full object-cover rounded-[32px]"
+                alt=""
+                className="
+                h-[350px]
+                md:h-[500px]
+                w-full
+                object-cover
+                rounded-[32px]
+                "
               />
 
               <h3 className="mt-6 text-2xl font-bold">
@@ -114,109 +135,113 @@ const Home = () => {
         </Container>
       </Section>
 
-      {/* CATEGORIES */}
+      {/* MATERIAL CATEGORIES */}
 
       <Section>
         <Container>
-          <h2 className="text-6xl font-bold mb-16">
+          <h2 className="text-4xl md:text-6xl font-bold mb-16">
             Material Categories
           </h2>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            <img
-              src={mdf}
-              className="h-[400px] object-cover rounded-[32px]"
-            />
+          <div className="grid grid-cols-2 gap-4 md:gap-8">
+            <div className="relative group overflow-hidden rounded-[24px] md:rounded-[32px]">
+              <img
+                src={mdf}
+                alt="MDF Boards"
+                className="
+          w-full
+          h-[180px]
+          md:h-[350px]
+          lg:h-[400px]
+          object-cover
+          transition
+          duration-500
+          group-hover:scale-110
+          "
+              />
 
-            <img
-              src={plywood}
-              className="h-[400px] object-cover rounded-[32px]"
-            />
+              <div className="absolute inset-0 bg-black/40" />
 
-            <img
-              src={hdf}
-              className="h-[400px] object-cover rounded-[32px]"
-            />
-
-            <img
-              src={accessories}
-              className="h-[400px] object-cover rounded-[32px]"
-            />
-          </div>
-        </Container>
-      </Section>
-
-      {/* STATS */}
-
-      <Section>
-        <Container>
-          <div className="grid md:grid-cols-4 gap-10">
-            <div>
-              <h3 className="text-5xl font-bold">
-                500+
-              </h3>
-
-              <p className="text-white/60 mt-4">
-                Completed Projects
-              </p>
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                <h3 className="font-bold text-lg md:text-3xl">
+                  MDF
+                </h3>
+              </div>
             </div>
 
-            <div>
-              <h3 className="text-5xl font-bold">
-                10+
-              </h3>
+            <div className="relative group overflow-hidden rounded-[24px] md:rounded-[32px]">
+              <img
+                src={plywood}
+                alt="Plywood"
+                className="
+          w-full
+          h-[180px]
+          md:h-[350px]
+          lg:h-[400px]
+          object-cover
+          transition
+          duration-500
+          group-hover:scale-110
+          "
+              />
 
-              <p className="text-white/60 mt-4">
-                Years Experience
-              </p>
+              <div className="absolute inset-0 bg-black/40" />
+
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                <h3 className="font-bold text-lg md:text-3xl">
+                  Plywood
+                </h3>
+              </div>
             </div>
 
-            <div>
-              <h3 className="text-5xl font-bold">
-                1000+
-              </h3>
+            <div className="relative group overflow-hidden rounded-[24px] md:rounded-[32px]">
+              <img
+                src={hdf}
+                alt="HDF Boards"
+                className="
+          w-full
+          h-[180px]
+          md:h-[350px]
+          lg:h-[400px]
+          object-cover
+          transition
+          duration-500
+          group-hover:scale-110
+          "
+              />
 
-              <p className="text-white/60 mt-4">
-                Customers Served
-              </p>
+              <div className="absolute inset-0 bg-black/40" />
+
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                <h3 className="font-bold text-lg md:text-3xl">
+                  HDF
+                </h3>
+              </div>
             </div>
 
-            <div>
-              <h3 className="text-5xl font-bold">
-                24/7
-              </h3>
+            <div className="relative group overflow-hidden rounded-[24px] md:rounded-[32px]">
+              <img
+                src={accessories}
+                alt="Accessories"
+                className="
+          w-full
+          h-[180px]
+          md:h-[350px]
+          lg:h-[400px]
+          object-cover
+          transition
+          duration-500
+          group-hover:scale-110
+          "
+              />
 
-              <p className="text-white/60 mt-4">
-                Customer Support
-              </p>
-            </div>
-          </div>
-        </Container>
-      </Section>
+              <div className="absolute inset-0 bg-black/40" />
 
-      {/* BUILD ASSISTANT */}
-
-      <Section>
-        <Container>
-          <div className="border border-white/10 rounded-[40px] p-20">
-            <p className="text-[#D4AF37] uppercase tracking-[0.3em] mb-6">
-              Build Assistant
-            </p>
-
-            <h2 className="text-6xl font-bold max-w-4xl">
-              Tell Us What
-              <br />
-              You're Building.
-            </h2>
-
-            <p className="text-white/60 mt-8 max-w-2xl">
-              Get instant material and accessory recommendations.
-            </p>
-
-            <div className="mt-10">
-              <Button>
-                Generate Project Quote
-              </Button>
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+                <h3 className="font-bold text-lg md:text-3xl">
+                  Accessories
+                </h3>
+              </div>
             </div>
           </div>
         </Container>
@@ -232,7 +257,7 @@ const Home = () => {
                 Visit Us
               </p>
 
-              <h2 className="text-6xl font-bold mt-6">
+              <h2 className="text-4xl md:text-6xl font-bold mt-6">
                 419 OKE-ARO
                 <br />
                 ROAD
@@ -243,7 +268,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="h-[500px] rounded-[32px] bg-zinc-900"></div>
+            <div className="h-[300px] md:h-[500px] rounded-[32px] bg-zinc-900"></div>
           </div>
         </Container>
       </Section>

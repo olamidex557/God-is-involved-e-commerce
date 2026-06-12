@@ -9,6 +9,7 @@ import Button from "../../components/ui/Button";
 import heroKitchen from "../../assets/images/hero/hero-kitchen.jpg";
 import heroWardrobe from "../../assets/images/hero/hero-wardrobe.jpg";
 import heroOffice from "../../assets/images/hero/hero-office.jpg";
+import herobg from "../../assets/images/hero/hero-bg.jpg";
 
 import kitchenProject from "../../assets/images/projects/kitchen.jpg";
 import wardrobeProject from "../../assets/images/projects/wardrobe.jpg";
@@ -23,6 +24,7 @@ import showroom from "../../assets/images/location/showroom.jpg";
 
 const Home = () => {
   const heroSlides = [
+    herobg,
     heroKitchen,
     heroWardrobe,
     heroOffice,

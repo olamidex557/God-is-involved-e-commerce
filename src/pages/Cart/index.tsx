@@ -1,22 +1,37 @@
 import { Link } from "react-router-dom";
-import Container from "../../components/ui/Container";
 
-const cartItems = [
-  {
-    id: 1,
-    name: "Walnut MDF Board",
-    size: "4ft × 8ft",
-    thickness: "18mm",
-    price: 25000,
-    quantity: 2,
-  },
-];
+import Container from "../../components/ui/Container";
+import Button from "../../components/ui/Button";
+
+import { useCartStore } from "../../store/cartStore";
 
 const Cart = () => {
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
+  const items = useCartStore(
+    (state) => state.items
   );
+
+  const removeItem = useCartStore(
+    (state) => state.removeItem
+  );
+
+  const updateQuantity =
+    useCartStore(
+      (state) =>
+        state.updateQuantity
+    );
+
+  const clearCart = useCartStore(
+    (state) => state.clearCart
+  );
+
+  const subtotal =
+    items.reduce(
+      (total, item) =>
+        total +
+        item.price *
+          item.quantity,
+      0
+    );
 
   return (
     <div className="pt-32 pb-32">
@@ -24,42 +39,56 @@ const Cart = () => {
         {/* HEADER */}
 
         <div className="mb-16">
-          <p className="uppercase tracking-[0.3em] text-[#D4AF37] mb-4">
+          <p
+            className="
+            uppercase
+            tracking-[0.3em]
+            text-[#D4AF37]
+            mb-4
+            "
+          >
             Shopping Cart
           </p>
 
-          <h1 className="text-5xl md:text-7xl font-bold">
+          <h1
+            className="
+            text-5xl
+            md:text-7xl
+            font-bold
+            "
+          >
             Your Cart
           </h1>
         </div>
 
-        {/* EMPTY STATE */}
+        {/* EMPTY CART */}
 
-        {cartItems.length === 0 ? (
-          <div className="text-center py-24">
+        {items.length === 0 ? (
+          <div
+            className="
+            text-center
+            py-24
+            border
+            border-white/10
+            rounded-[40px]
+            "
+          >
             <h2 className="text-4xl font-bold">
-              Your cart is empty
+              Your Cart Is Empty
             </h2>
 
             <p className="text-white/60 mt-6">
-              Explore our premium materials collection.
+              Start exploring our
+              premium materials.
             </p>
 
-            <Link
-              to="/materials"
-              className="
-              inline-block
-              mt-8
-              bg-[#D4AF37]
-              text-black
-              px-8
-              py-4
-              rounded-full
-              font-semibold
-              "
-            >
-              Browse Materials
-            </Link>
+            <div className="mt-8">
+              <Link to="/materials">
+                <Button>
+                  Browse Materials
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid lg:grid-cols-[2fr_1fr] gap-10">
@@ -67,7 +96,7 @@ const Cart = () => {
 
             <div>
               <div className="space-y-6">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <div
                     key={item.id}
                     className="
@@ -83,10 +112,10 @@ const Cart = () => {
                       <div
                         className="
                         w-full
-                        md:w-40
-                        h-40
-                        bg-zinc-900
+                        md:w-36
+                        h-36
                         rounded-2xl
+                        bg-zinc-900
                         "
                       />
 
@@ -97,11 +126,7 @@ const Cart = () => {
                           {item.name}
                         </h3>
 
-                        <p className="text-white/50 mt-2">
-                          {item.size} • {item.thickness}
-                        </p>
-
-                        <p className="mt-4 text-xl font-semibold">
+                        <p className="text-white/60 mt-2">
                           ₦
                           {item.price.toLocaleString()}
                         </p>
@@ -110,20 +135,27 @@ const Cart = () => {
 
                         <div className="flex items-center gap-3 mt-6">
                           <button
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.quantity -
+                                  1
+                              )
+                            }
                             className="
                             w-10
                             h-10
+                            rounded-xl
                             border
                             border-white/10
-                            rounded-xl
                             "
                           >
-                            −
+                            -
                           </button>
 
                           <div
                             className="
-                            w-10
+                            w-12
                             h-10
                             flex
                             items-center
@@ -137,21 +169,45 @@ const Cart = () => {
                           </div>
 
                           <button
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.quantity +
+                                  1
+                              )
+                            }
                             className="
                             w-10
                             h-10
+                            rounded-xl
                             border
                             border-white/10
-                            rounded-xl
                             "
                           >
                             +
                           </button>
                         </div>
 
+                        {/* TOTAL */}
+
+                        <p className="mt-6 font-bold">
+                          ₦
+                          {(
+                            item.price *
+                            item.quantity
+                          ).toLocaleString()}
+                        </p>
+
+                        {/* REMOVE */}
+
                         <button
+                          onClick={() =>
+                            removeItem(
+                              item.id
+                            )
+                          }
                           className="
-                          mt-6
+                          mt-4
                           text-red-400
                           "
                         >
@@ -163,66 +219,36 @@ const Cart = () => {
                 ))}
               </div>
 
-              {/* CONTINUE SHOPPING */}
+              {/* ACTIONS */}
 
-              <Link
-                to="/materials"
-                className="
-                inline-block
-                mt-8
-                border
-                border-white/10
-                px-8
-                py-4
-                rounded-full
-                "
-              >
-                Continue Shopping
-              </Link>
+              <div className="flex flex-wrap gap-4 mt-8">
+                <Link to="/materials">
+                  <button
+                    className="
+                    border
+                    border-white/10
+                    rounded-full
+                    px-8
+                    py-4
+                    "
+                  >
+                    Continue Shopping
+                  </button>
+                </Link>
 
-              {/* ACCESSORIES */}
-
-              <div className="mt-20">
-                <h2 className="text-3xl font-bold mb-8">
-                  Frequently Bought Together
-                </h2>
-
-                <div className="grid md:grid-cols-3 gap-6">
-                  {[
-                    "Edge Banding",
-                    "Handles",
-                    "Soft Close Hinges",
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="
-                      border
-                      border-white/10
-                      rounded-[24px]
-                      p-5
-                      "
-                    >
-                      <div className="h-40 bg-zinc-900 rounded-2xl mb-4" />
-
-                      <h3 className="font-semibold">
-                        {item}
-                      </h3>
-
-                      <p className="text-white/60 mt-2">
-                        ₦5,000
-                      </p>
-
-                      <button
-                        className="
-                        mt-4
-                        text-[#D4AF37]
-                        "
-                      >
-                        Add To Cart
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                <button
+                  onClick={clearCart}
+                  className="
+                  border
+                  border-red-500/20
+                  text-red-400
+                  rounded-full
+                  px-8
+                  py-4
+                  "
+                >
+                  Clear Cart
+                </button>
               </div>
             </div>
 
@@ -243,9 +269,38 @@ const Cart = () => {
                   Order Summary
                 </h2>
 
-                <div className="space-y-5">
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="
+                      flex
+                      justify-between
+                      text-sm
+                      "
+                    >
+                      <span>
+                        {item.name}
+                      </span>
+
+                      <span>
+                        ₦
+                        {(
+                          item.price *
+                          item.quantity
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <hr className="border-white/10 my-8" />
+
+                <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span>Subtotal</span>
+                    <span>
+                      Subtotal
+                    </span>
 
                     <span>
                       ₦
@@ -254,68 +309,46 @@ const Cart = () => {
                   </div>
 
                   <div className="flex justify-between">
-                    <span>Delivery</span>
-
-                    <span>Calculated at Checkout</span>
-                  </div>
-
-                  <hr className="border-white/10" />
-
-                  <div className="flex justify-between text-xl font-bold">
-                    <span>Total</span>
+                    <span>
+                      Delivery
+                    </span>
 
                     <span>
-                      ₦
-                      {subtotal.toLocaleString()}
+                      Calculated Later
                     </span>
                   </div>
                 </div>
 
-                {/* DELIVERY */}
+                <hr className="border-white/10 my-8" />
 
-                <div
-                  className="
-                  mt-8
-                  p-5
-                  rounded-2xl
-                  bg-zinc-900
-                  "
-                >
-                  <p className="text-sm text-white/60">
-                    Delivery fee is calculated using
-                    distance from our store at
-                    419 Oke-Aro Road.
-                  </p>
+                <div className="flex justify-between text-2xl font-bold">
+                  <span>Total</span>
+
+                  <span>
+                    ₦
+                    {subtotal.toLocaleString()}
+                  </span>
                 </div>
 
-                <Link
-                  to="/checkout"
-                  className="
-                  block
-                  text-center
-                  mt-8
-                  bg-[#D4AF37]
-                  text-black
-                  py-4
-                  rounded-full
-                  font-semibold
-                  "
-                >
-                  Proceed To Checkout
-                </Link>
+                <div className="mt-8">
+                  <Link to="/checkout">
+                    <Button className="w-full">
+                      Proceed To Checkout
+                    </Button>
+                  </Link>
+                </div>
 
-                <button
+                <p
                   className="
-                  w-full
-                  mt-4
-                  border
-                  border-white/10
-                  py-4
-                  rounded-full
+                  text-white/50
+                  text-sm
+                  mt-6
                   "
                 >
-                  Clear Cart
-                </button>
+                  Delivery charges will
+                  be calculated based on
+                  your location.
+                </p>
               </div>
             </div>
           </div>

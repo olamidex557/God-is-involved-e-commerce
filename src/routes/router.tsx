@@ -13,6 +13,7 @@ import Quotation from "../pages/Quotation";
 import Contact from "../pages/Contact";
 import Orders from "../pages/Orders";
 import Profile from "../pages/Profile";
+import OrderSuccess from "../pages/OrderSuccess";
 
 import Dashboard from "../pages/Dashboard";
 
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/order-success",
+        element: <OrderSuccess />,
       },
     ],
   },

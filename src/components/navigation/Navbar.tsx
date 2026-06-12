@@ -1,14 +1,62 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
+
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  LayoutDashboard,
+} from "lucide-react";
 
 import logo from "../../assets/images/logo/logo.png";
 
+import { useCartStore } from "../../store/cartStore";
+
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] =
+    useState(false);
+
+  const location =
+    useLocation();
+
+  const cartItems =
+    useCartStore(
+      (state) => state.items
+    );
+
+  const totalItems =
+    cartItems.reduce(
+      (sum, item) =>
+        sum + item.quantity,
+      0
+    );
+
+  const navLinks = [
+    {
+      label: "Home",
+      path: "/",
+    },
+    {
+      label: "Materials",
+      path: "/materials",
+    },
+    {
+      label: "Quotation",
+      path: "/quotation",
+    },
+    {
+      label: "Contact",
+      path: "/contact",
+    },
+  ];
 
   return (
     <>
+      {/* NAVBAR */}
+
       <header
         className="
         fixed
@@ -27,7 +75,8 @@ const Navbar = () => {
             backdrop-blur-2xl
             border
             border-white/10
-            px-8
+            px-6
+            lg:px-8
             flex
             items-center
             justify-between
@@ -51,47 +100,96 @@ const Navbar = () => {
               />
             </Link>
 
-            {/* DESKTOP */}
+            {/* DESKTOP NAV */}
 
-            <nav className="hidden lg:flex items-center gap-10">
-              <Link
-                to="/"
-                className="hover:text-[#D4AF37]"
-              >
-                Home
-              </Link>
-
-              <Link
-                to="/materials"
-                className="hover:text-[#D4AF37]"
-              >
-                Materials
-              </Link>
-
-              <Link
-                to="/quotation"
-                className="hover:text-[#D4AF37]"
-              >
-                Quotations
-              </Link>
-
-              <Link
-                to="/contact"
-                className="hover:text-[#D4AF37]"
-              >
-                Contact
-              </Link>
+            <nav
+              className="
+              hidden
+              lg:flex
+              items-center
+              gap-10
+              "
+            >
+              {navLinks.map(
+                (link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`
+                      transition
+                      hover:text-[#D4AF37]
+                      ${
+                        location.pathname ===
+                        link.path
+                          ? "text-[#D4AF37]"
+                          : "text-white"
+                      }
+                    `}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              )}
             </nav>
 
             {/* RIGHT */}
 
             <div className="flex items-center gap-5">
-              <Link to="/cart">
-                <ShoppingBag size={22} />
+              {/* DASHBOARD */}
+
+              <Link
+                to="/dashboard"
+                className="
+                hidden
+                md:flex
+                "
+              >
+                <LayoutDashboard
+                  size={22}
+                />
               </Link>
 
+              {/* CART */}
+
+              <Link
+                to="/cart"
+                className="
+                relative
+                "
+              >
+                <ShoppingBag
+                  size={24}
+                />
+
+                {totalItems > 0 && (
+                  <span
+                    className="
+                    absolute
+                    -top-2
+                    -right-2
+                    w-5
+                    h-5
+                    rounded-full
+                    bg-[#D4AF37]
+                    text-black
+                    text-xs
+                    font-bold
+                    flex
+                    items-center
+                    justify-center
+                    "
+                  >
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+
+              {/* MOBILE MENU */}
+
               <button
-                className="lg:hidden"
+                className="
+                lg:hidden
+                "
                 onClick={() =>
                   setOpen(true)
                 }
@@ -103,7 +201,7 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE DRAWER */}
 
       <div
         className={`
@@ -112,7 +210,7 @@ const Navbar = () => {
           z-[100]
           bg-black
           transition-all
-          duration-500
+          duration-300
           ${
             open
               ? "opacity-100 visible"
@@ -121,7 +219,9 @@ const Navbar = () => {
         `}
       >
         <div className="p-8">
-          <div className="flex justify-between">
+          {/* TOP */}
+
+          <div className="flex justify-between items-center">
             <img
               src={logo}
               alt=""
@@ -137,47 +237,58 @@ const Navbar = () => {
             </button>
           </div>
 
+          {/* LINKS */}
+
           <div
             className="
             flex
             flex-col
             gap-8
-            mt-24
+            mt-20
             "
           >
+            {navLinks.map(
+              (link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  "
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
+
             <Link
-              to="/"
-              className="text-4xl font-bold"
+              to="/dashboard"
+              onClick={() =>
+                setOpen(false)
+              }
+              className="
+              text-4xl
+              font-bold
+              "
             >
-              Home
+              Dashboard
             </Link>
 
             <Link
-              to="/materials"
-              className="text-4xl font-bold"
+              to="/cart"
+              onClick={() =>
+                setOpen(false)
+              }
+              className="
+              text-4xl
+              font-bold
+              "
             >
-              Materials
-            </Link>
-
-            <Link
-              to="/quotation"
-              className="text-4xl font-bold"
-            >
-              Quotations
-            </Link>
-
-            <Link
-              to="/contact"
-              className="text-4xl font-bold"
-            >
-              Contact
-            </Link>
-
-            <Link
-              to="/login"
-              className="text-4xl font-bold"
-            >
-              Login
+              Cart
             </Link>
           </div>
         </div>

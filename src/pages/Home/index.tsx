@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import Container from "../../components/ui/Container";
 import Section from "../../components/ui/Section";
 import Heading from "../../components/ui/Heading";
@@ -55,9 +57,11 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-12">
-              <Button>
-                Explore Materials
-              </Button>
+              <Link to="/materials">
+                <Button>
+                  Explore Materials
+                </Button>
+              </Link>
 
               <button className="border border-white/20 px-8 py-4 rounded-full">
                 Generate Quote

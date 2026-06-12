@@ -6,6 +6,8 @@ import mockProduct from "../../data/mockProduct";
 const Product = () => {
   const { slug } = useParams();
 
+console.log(slug);
+
   // Later:
   // const { data: product } = useProduct(slug);
 

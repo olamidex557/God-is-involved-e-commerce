@@ -14,6 +14,8 @@ import Contact from "../pages/Contact";
 import Orders from "../pages/Orders";
 import Profile from "../pages/Profile";
 
+import Dashboard from "../pages/Dashboard";
+
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -49,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
       },
       {
         path: "/orders",

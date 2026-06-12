@@ -35,14 +35,18 @@ const Navbar = () => {
           >
             {/* LOGO */}
 
-            <Link to="/">
+            <Link to="/" className="flex items-center">
               <img
                 src={logo}
                 alt="God Is Involved"
                 className="
-                h-12
-                md:h-16
+                h-20
+                sm:h-24
+                md:h-28
+                lg:h-32
+                w-auto
                 object-contain
+                drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]
                 "
               />
             </Link>

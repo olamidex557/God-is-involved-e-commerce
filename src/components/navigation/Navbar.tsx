@@ -5,54 +5,94 @@ import { Menu, X, ShoppingBag } from "lucide-react";
 import logo from "../../assets/images/logo/logo.png";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="h-24 flex items-center justify-between">
+      <header
+        className="
+        fixed
+        top-4
+        left-0
+        right-0
+        z-50
+        "
+      >
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div
+            className="
+            h-20
+            rounded-full
+            bg-black/30
+            backdrop-blur-2xl
+            border
+            border-white/10
+            px-8
+            flex
+            items-center
+            justify-between
+            "
+          >
+            {/* LOGO */}
+
             <Link to="/">
               <img
                 src={logo}
                 alt="God Is Involved"
-                className="h-16 md:h-20 object-contain"
+                className="
+                h-12
+                md:h-16
+                object-contain
+                "
               />
             </Link>
 
+            {/* DESKTOP */}
+
             <nav className="hidden lg:flex items-center gap-10">
               <Link
+                to="/"
+                className="hover:text-[#D4AF37]"
+              >
+                Home
+              </Link>
+
+              <Link
                 to="/materials"
-                className="hover:text-[#D4AF37] transition"
+                className="hover:text-[#D4AF37]"
               >
                 Materials
               </Link>
 
               <Link
                 to="/quotation"
-                className="hover:text-[#D4AF37] transition"
+                className="hover:text-[#D4AF37]"
               >
                 Quotations
               </Link>
 
               <Link
                 to="/contact"
-                className="hover:text-[#D4AF37] transition"
+                className="hover:text-[#D4AF37]"
               >
                 Contact
               </Link>
             </nav>
 
+            {/* RIGHT */}
+
             <div className="flex items-center gap-5">
               <Link to="/cart">
-                <ShoppingBag />
+                <ShoppingBag size={22} />
               </Link>
 
               <button
-                onClick={() => setIsOpen(true)}
                 className="lg:hidden"
+                onClick={() =>
+                  setOpen(true)
+                }
               >
-                <Menu />
+                <Menu size={28} />
               </button>
             </div>
           </div>
@@ -63,35 +103,46 @@ const Navbar = () => {
 
       <div
         className={`
-          fixed inset-0 z-[100]
+          fixed
+          inset-0
+          z-[100]
           bg-black
-          transition-all duration-300
+          transition-all
+          duration-500
           ${
-            isOpen
+            open
               ? "opacity-100 visible"
               : "opacity-0 invisible"
           }
         `}
       >
-        <div className="h-full flex flex-col p-8">
-          <div className="flex justify-between items-center">
+        <div className="p-8">
+          <div className="flex justify-between">
             <img
               src={logo}
-              alt="Logo"
-              className="h-14"
+              alt=""
+              className="h-12"
             />
 
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() =>
+                setOpen(false)
+              }
             >
-              <X size={28} />
+              <X size={30} />
             </button>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center gap-8">
+          <div
+            className="
+            flex
+            flex-col
+            gap-8
+            mt-24
+            "
+          >
             <Link
               to="/"
-              onClick={() => setIsOpen(false)}
               className="text-4xl font-bold"
             >
               Home
@@ -99,7 +150,6 @@ const Navbar = () => {
 
             <Link
               to="/materials"
-              onClick={() => setIsOpen(false)}
               className="text-4xl font-bold"
             >
               Materials
@@ -107,7 +157,6 @@ const Navbar = () => {
 
             <Link
               to="/quotation"
-              onClick={() => setIsOpen(false)}
               className="text-4xl font-bold"
             >
               Quotations
@@ -115,7 +164,6 @@ const Navbar = () => {
 
             <Link
               to="/contact"
-              onClick={() => setIsOpen(false)}
               className="text-4xl font-bold"
             >
               Contact
@@ -123,7 +171,6 @@ const Navbar = () => {
 
             <Link
               to="/login"
-              onClick={() => setIsOpen(false)}
               className="text-4xl font-bold"
             >
               Login

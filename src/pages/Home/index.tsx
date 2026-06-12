@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
 
 import Container from "../../components/ui/Container";
 import Section from "../../components/ui/Section";

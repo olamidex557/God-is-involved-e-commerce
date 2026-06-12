@@ -1,20 +1,12 @@
-import {
-  useEffect,
-  useRef,
-} from "react";
-
+import { useEffect, RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Props {
-  children: React.ReactNode;
-}
-
-const Reveal = ({ children }: Props) => {
-  const ref = useRef<HTMLDivElement>(null);
-
+export const useReveal = (
+  ref: RefObject<HTMLElement | null>
+) => {
   useEffect(() => {
     if (!ref.current) return;
 
@@ -31,13 +23,10 @@ const Reveal = ({ children }: Props) => {
         ease: "power3.out",
         scrollTrigger: {
           trigger: ref.current,
-          start: "top 80%",
+          start: "top 85%",
+          once: true,
         },
       }
     );
-  }, []);
-
-  return <div ref={ref}>{children}</div>;
+  }, [ref]);
 };
-
-export default Reveal;

@@ -1,184 +1,233 @@
 import { Link } from "react-router-dom";
 
-const products = [
-  {
-    id: 1,
-    name: "Walnut MDF",
-    price: "₦25,000",
-    category: "MDF",
-    slug: "walnut-mdf",
-  },
-  {
-    id: 2,
-    name: "White Ash MDF",
-    price: "₦28,000",
-    category: "MDF",
-    slug: "white-ash-mdf",
-  },
-  {
-    id: 3,
-    name: "Premium Plywood",
-    price: "₦30,000",
-    category: "Plywood",
-    slug: "premium-plywood",
-  },
-  {
-    id: 4,
-    name: "HDF Board",
-    price: "₦27,000",
-    category: "HDF",
-    slug: "hdf-board",
-  },
-];
+import Container from "../../components/ui/Container";
+import { useProducts } from "../../hooks/useProducts";
 
 const Materials = () => {
+  const {
+    products,
+    loading,
+  } = useProducts();
+
   return (
-    <div className="pt-32 pb-24">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <div className="pt-32 pb-32">
+      <Container>
         {/* HEADER */}
 
-        <div className="mb-16">
-          <p className="uppercase tracking-[0.3em] text-[#D4AF37] mb-4">
-            Materials Collection
+        <div className="mb-20">
+          <p
+            className="
+            uppercase
+            tracking-[0.3em]
+            text-[#D4AF37]
+            mb-4
+            "
+          >
+            Premium Collection
           </p>
 
-          <h1 className="text-5xl md:text-7xl font-bold">
-            Premium
-            <br />
+          <h1
+            className="
+            text-5xl
+            md:text-7xl
+            font-bold
+            "
+          >
             Materials
           </h1>
 
-          <p className="text-white/60 mt-8 max-w-2xl">
-            Explore MDF, HDF, plywood and furniture
-            accessories for your next project.
+          <p
+            className="
+            text-white/60
+            mt-6
+            max-w-2xl
+            "
+          >
+            Explore premium boards,
+            fittings, accessories and
+            materials curated for
+            luxury interior projects.
           </p>
         </div>
 
-        {/* SEARCH */}
+        {/* LOADING */}
 
-        <div className="mb-10">
-          <input
-            type="text"
-            placeholder="Search materials..."
+        {loading && (
+          <div
             className="
-            w-full
-            bg-zinc-900
-            border
-            border-white/10
-            rounded-2xl
-            p-5
-            outline-none
+            grid
+            grid-cols-2
+            lg:grid-cols-4
+            gap-6
             "
-          />
-        </div>
+          >
+            {[...Array(8)].map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="
+                  h-[320px]
+                  rounded-[32px]
+                  bg-zinc-900
+                  animate-pulse
+                  "
+                />
+              )
+            )}
+          </div>
+        )}
 
-        {/* FILTERS */}
+        {/* EMPTY STATE */}
 
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-10">
-          <button className="px-5 py-3 rounded-full bg-[#D4AF37] text-black whitespace-nowrap">
-            All
-          </button>
+        {!loading &&
+          products.length === 0 && (
+            <div
+              className="
+              text-center
+              py-24
+              border
+              border-white/10
+              rounded-[40px]
+              "
+            >
+              <h2 className="text-3xl font-bold">
+                No Products Yet
+              </h2>
 
-          <button className="px-5 py-3 rounded-full border border-white/10 whitespace-nowrap">
-            MDF
-          </button>
-
-          <button className="px-5 py-3 rounded-full border border-white/10 whitespace-nowrap">
-            HDF
-          </button>
-
-          <button className="px-5 py-3 rounded-full border border-white/10 whitespace-nowrap">
-            Plywood
-          </button>
-
-          <button className="px-5 py-3 rounded-full border border-white/10 whitespace-nowrap">
-            Accessories
-          </button>
-        </div>
-
-        {/* PRODUCT COUNT */}
-
-        <div className="mb-10 text-white/50">
-          Showing {products.length} Products
-        </div>
+              <p className="text-white/60 mt-4">
+                Products will appear here
+                once added from the admin
+                dashboard.
+              </p>
+            </div>
+          )}
 
         {/* PRODUCTS */}
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              to={`/product/${product.slug}`}
+        {!loading &&
+          products.length > 0 && (
+            <div
               className="
-              group
-              block
+              grid
+              grid-cols-2
+              lg:grid-cols-4
+              gap-6
               "
             >
-              <div
-                className="
-                overflow-hidden
-                rounded-[24px]
-                border
-                border-white/10
-                "
-              >
-                <div
-                  className="
-                  h-[220px]
-                  md:h-[320px]
-                  bg-zinc-900
-                  group-hover:scale-105
-                  transition
-                  duration-500
-                  "
-                />
-              </div>
+              {products.map(
+                (product: any) => (
+                  <Link
+                    key={product._id}
+                    to={`/product/${product._id}`}
+                    className="
+                    group
+                    "
+                  >
+                    <div
+                      className="
+                      border
+                      border-white/10
+                      rounded-[32px]
+                      overflow-hidden
+                      bg-zinc-950
+                      transition
+                      duration-300
+                      hover:border-[#D4AF37]
+                      "
+                    >
+                      {/* IMAGE */}
 
-              <div className="mt-4">
-                <p className="text-[#D4AF37] text-sm">
-                  {product.category}
-                </p>
+                      <div
+                        className="
+                        h-[250px]
+                        overflow-hidden
+                        "
+                      >
+                        <img
+                          src={
+                            product
+                              .images?.[0] ||
+                            "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200"
+                          }
+                          alt={
+                            product.name
+                          }
+                          className="
+                          w-full
+                          h-full
+                          object-cover
+                          transition
+                          duration-500
+                          group-hover:scale-110
+                          "
+                        />
+                      </div>
 
-                <h3 className="font-bold text-lg mt-1">
-                  {product.name}
-                </h3>
+                      {/* CONTENT */}
 
-                <p className="text-white/60 mt-2">
-                  {product.price}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+                      <div className="p-5">
+                        <p
+                          className="
+                          text-[#D4AF37]
+                          text-sm
+                          mb-2
+                          "
+                        >
+                          {
+                            product.category
+                          }
+                        </p>
 
-        {/* CTA */}
+                        <h3
+                          className="
+                          text-lg
+                          font-semibold
+                          "
+                        >
+                          {product.name}
+                        </h3>
 
-        <div className="mt-24 border border-white/10 rounded-[40px] p-8 md:p-16">
-          <h2 className="text-3xl md:text-5xl font-bold">
-            Need Help Choosing
-            Materials?
-          </h2>
+                        <p
+                          className="
+                          text-white/60
+                          text-sm
+                          mt-2
+                          line-clamp-2
+                          "
+                        >
+                          {
+                            product.description
+                          }
+                        </p>
 
-          <p className="text-white/60 mt-6 max-w-2xl">
-            Generate a project quotation and get
-            recommendations instantly.
-          </p>
+                        <div className="mt-5 flex justify-between items-center">
+                          <span
+                            className="
+                            text-xl
+                            font-bold
+                            "
+                          >
+                            ₦
+                            {product.price.toLocaleString()}
+                          </span>
 
-          <button
-            className="
-            mt-8
-            bg-[#D4AF37]
-            text-black
-            px-8
-            py-4
-            rounded-full
-            font-semibold
-            "
-          >
-            Generate Quote
-          </button>
-        </div>
-      </div>
+                          <span
+                            className="
+                            text-sm
+                            text-white/50
+                            "
+                          >
+                            View →
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              )}
+            </div>
+          )}
+      </Container>
     </div>
   );
 };

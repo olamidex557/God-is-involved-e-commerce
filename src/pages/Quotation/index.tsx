@@ -3,8 +3,8 @@ import { useState } from "react";
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
 
-import {
-  calculateWardrobeQuote,
+import { calculateWardrobeQuote } from "../../data/quoteCalculator";
+import type {
   QuoteResult,
 } from "../../data/quoteCalculator";
 

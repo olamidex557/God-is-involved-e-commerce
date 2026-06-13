@@ -29,6 +29,11 @@ import ProductsAdmin from "./pages/admin/Products";
 import AdminRouteLayout from "./layouts/AdminRouteLayout";
 import OrdersAdmin from "./pages/admin/Orders";
 import Inventory from "./pages/admin/Inventory";
+import Quotations from "./pages/admin/Quotations";
+import Users from "./pages/admin/Users";
+import Payments from "./pages/admin/Payments";
+import Delivery from "./pages/admin/Delivery";
+import Settings from "./pages/admin/Settings";
 
 /* PUBLIC LAYOUT */
 
@@ -141,6 +146,30 @@ function App() {
         <Route
           path="/admin/inventory"
           element={<Inventory />}
+        />
+
+        <Route
+          path="/admin/quotations"
+          element={<Quotations />}
+        />
+
+        <Route
+          path="/admin/users"
+          element={<Users />}
+        />
+
+        <Route
+          path="/admin/payments"
+          element={<Payments />}
+        />
+
+        <Route
+          path="/admin/delivery"
+          element={<Delivery />}
+        />
+        <Route
+          path="/admin/settings"
+          element={<Settings />}
         />
       </Route>
     </Routes>

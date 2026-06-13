@@ -9,6 +9,7 @@ import {
   CreditCard,
   Truck,
   Settings,
+  FileText,
 } from "lucide-react";
 
 const links = [
@@ -52,6 +53,11 @@ const links = [
     icon: Settings,
     href: "/admin/settings",
   },
+  {
+  name: "Quotes",
+  icon: FileText,
+  href: "/admin/quotations",
+},
 ];
 
 const AdminSidebar = () => {

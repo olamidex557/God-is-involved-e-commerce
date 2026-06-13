@@ -34,6 +34,8 @@ import Users from "./pages/admin/Users";
 import Payments from "./pages/admin/Payments";
 import Delivery from "./pages/admin/Delivery";
 import Settings from "./pages/admin/Settings";
+import ProtectedAdminRoute
+  from "./routes/ProtectedAdminRoute";
 
 /* PUBLIC LAYOUT */
 
@@ -126,51 +128,76 @@ function App() {
       {/* ADMIN */}
 
       <Route
-        element={<AdminRouteLayout />}
+        element={
+          <ProtectedAdminRoute />
+        }
       >
         <Route
-          path="/admin/dashboard"
-          element={<AdminDashboard />}
-        />
+          element={
+            <AdminRouteLayout />
+          }
+        >
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminDashboard />
+            }
+          />
 
-        <Route
-          path="/admin/products"
-          element={<ProductsAdmin />}
-        />
+          <Route
+            path="/admin/products"
+            element={
+              <ProductsAdmin />
+            }
+          />
 
-        <Route
-          path="/admin/orders"
-          element={<OrdersAdmin />}
-        />
+          <Route
+            path="/admin/inventory"
+            element={
+              <Inventory />
+            }
+          />
 
-        <Route
-          path="/admin/inventory"
-          element={<Inventory />}
-        />
+          <Route
+            path="/admin/orders"
+            element={
+              <OrdersAdmin />
+            }
+          />
 
-        <Route
-          path="/admin/quotations"
-          element={<Quotations />}
-        />
+          <Route
+            path="/admin/quotations"
+            element={
+              <Quotations />
+            }
+          />
 
-        <Route
-          path="/admin/users"
-          element={<Users />}
-        />
+          <Route
+            path="/admin/users"
+            element={<Users />}
+          />
 
-        <Route
-          path="/admin/payments"
-          element={<Payments />}
-        />
+          <Route
+            path="/admin/payments"
+            element={
+              <Payments />
+            }
+          />
 
-        <Route
-          path="/admin/delivery"
-          element={<Delivery />}
-        />
-        <Route
-          path="/admin/settings"
-          element={<Settings />}
-        />
+          <Route
+            path="/admin/delivery"
+            element={
+              <Delivery />
+            }
+          />
+
+          <Route
+            path="/admin/settings"
+            element={
+              <Settings />
+            }
+          />
+        </Route>
       </Route>
     </Routes>
   );

@@ -5,39 +5,38 @@ import ProductFilters from "../../../components/admin/products/ProductFilters";
 import ProductGrid from "../../../components/admin/products/ProductGrid";
 import CreateProductModal from "../../../components/admin/products/CreateProductModal";
 
-const mockProducts = [
-  {
-    name: "Walnut MDF",
-    category: "Boards",
-    price: 25000,
-    stock: 120,
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200",
-  },
-  {
-    name: "Oak Veneer",
-    category: "Veneers",
-    price: 18000,
-    stock: 50,
-    image:
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200",
-  },
-  {
-    name: "Black Edge Tape",
-    category: "Accessories",
-    price: 3000,
-    stock: 400,
-    image:
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200",
-  },
-];
+import { useAdminProducts } from "../../../hooks/products/useAdminProducts";
 
 const ProductsAdmin = () => {
   const [open, setOpen] =
     useState(false);
 
+  const {
+    products,
+    loading,
+  } =
+    useAdminProducts();
+
   return (
     <>
+      <div className="mb-8">
+        <h1
+          className="
+          text-4xl
+          font-bold
+          "
+        >
+          Products
+        </h1>
+
+        <p className="text-white/50 mt-2">
+          Manage products,
+          boards, fittings,
+          accessories and
+          inventory.
+        </p>
+      </div>
+
       <div
         className="
         flex
@@ -53,11 +52,34 @@ const ProductsAdmin = () => {
 
         <ProductFilters />
 
-        <ProductGrid
-          products={
-            mockProducts
-          }
-        />
+        {loading ? (
+          <div
+            className="
+            grid
+            md:grid-cols-2
+            xl:grid-cols-3
+            gap-6
+            "
+          >
+            {[...Array(6)].map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="
+                  h-[320px]
+                  rounded-3xl
+                  bg-white/5
+                  animate-pulse
+                  "
+                />
+              )
+            )}
+          </div>
+        ) : (
+          <ProductGrid
+            products={products}
+          />
+        )}
       </div>
 
       <CreateProductModal

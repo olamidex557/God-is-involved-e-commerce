@@ -1,16 +1,10 @@
-interface ProductCardProps {
-  product: {
-    name: string;
-    category: string;
-    price: number;
-    stock: number;
-    image: string;
-  };
+interface Props {
+  product: any;
 }
 
 const ProductCard = ({
   product,
-}: ProductCardProps) => {
+}: Props) => {
   return (
     <div
       className="
@@ -26,9 +20,17 @@ const ProductCard = ({
       hover:-translate-y-1
       "
     >
-      <div className="h-56">
+      <div
+        className="
+        h-56
+        overflow-hidden
+        "
+      >
         <img
-          src={product.image}
+          src={
+            product.images?.[0] ||
+            "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200"
+          }
           alt={product.name}
           className="
           w-full
@@ -42,7 +44,12 @@ const ProductCard = ({
       </div>
 
       <div className="p-5">
-        <p className="text-[#D4AF37] text-sm">
+        <p
+          className="
+          text-[#D4AF37]
+          text-sm
+          "
+        >
           {product.category}
         </p>
 
@@ -56,19 +63,41 @@ const ProductCard = ({
           {product.name}
         </h3>
 
-        <div
+        <p
           className="
-          flex
-          justify-between
-          mt-4
+          text-white/60
+          text-sm
+          mt-2
+          line-clamp-2
           "
         >
-          <span>
+          {product.description}
+        </p>
+
+        <div
+          className="
+          mt-5
+          flex
+          justify-between
+          items-center
+          "
+        >
+          <span
+            className="
+            text-xl
+            font-bold
+            "
+          >
             ₦
-            {product.price.toLocaleString()}
+            {product.price?.toLocaleString()}
           </span>
 
-          <span className="text-white/60">
+          <span
+            className="
+            text-white/50
+            text-sm
+            "
+          >
             {product.stock} pcs
           </span>
         </div>

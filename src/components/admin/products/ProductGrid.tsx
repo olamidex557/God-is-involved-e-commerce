@@ -2,10 +2,14 @@ import ProductCard from "./ProductCard";
 
 interface Props {
   products: any[];
+  onDelete: (
+    id: string
+  ) => void;
 }
 
 const ProductGrid = ({
   products,
+  onDelete,
 }: Props) => {
   return (
     <div
@@ -17,10 +21,11 @@ const ProductGrid = ({
       "
     >
       {products.map(
-        (product, index) => (
+        (product) => (
           <ProductCard
-            key={index}
+            key={product._id}
             product={product}
+            onDelete={onDelete}
           />
         )
       )}

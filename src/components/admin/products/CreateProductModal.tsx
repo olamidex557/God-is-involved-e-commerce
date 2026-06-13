@@ -1,13 +1,99 @@
+import { useState } from "react";
+
+import { createProduct, } from "../../../services/api/adminProducts";
+import ImageUploader from "../uploads/ImageUploader";
+
 interface Props {
   open: boolean;
   onClose: () => void;
+  onCreated: () => void;
 }
 
 const CreateProductModal = ({
   open,
   onClose,
+  onCreated,
 }: Props) => {
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [form, setForm] =
+    useState({
+      name: "",
+      slug: "",
+      description: "",
+      category: "",
+      price: "",
+      stock: "",
+      images: "",
+    });
+
   if (!open) return null;
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement |
+      HTMLTextAreaElement
+    >
+  ) => {
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  const handleSubmit =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
+
+      try {
+        setLoading(true);
+
+        console.log("FORM:", form);
+
+        await createProduct({
+          ...form,
+          price:
+            Number(
+              form.price
+            ),
+          stock:
+            Number(
+              form.stock
+            ),
+          images: [
+            form.images,
+          ],
+        });
+
+        onCreated();
+
+        onClose();
+
+        setForm({
+          name: "",
+          slug: "",
+          description: "",
+          category: "",
+          price: "",
+          stock: "",
+          images: "",
+        });
+      } catch (
+      error
+      ) {
+        console.error(
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <div
@@ -19,7 +105,7 @@ const CreateProductModal = ({
       flex
       items-center
       justify-center
-      z-[100]
+      z-50
       "
     >
       <div
@@ -56,9 +142,23 @@ const CreateProductModal = ({
           </button>
         </div>
 
-        <div className="space-y-4">
+        <form
+          onSubmit={
+            handleSubmit
+          }
+          className="
+          space-y-4
+          "
+        >
           <input
-            placeholder="Product Name"
+            name="name"
+            placeholder="Name"
+            value={
+              form.name
+            }
+            onChange={
+              handleChange
+            }
             className="
             w-full
             p-4
@@ -68,7 +168,31 @@ const CreateProductModal = ({
           />
 
           <input
+            name="slug"
+            placeholder="Slug"
+            value={
+              form.slug
+            }
+            onChange={
+              handleChange
+            }
+            className="
+            w-full
+            p-4
+            rounded-xl
+            bg-white/5
+            "
+          />
+
+          <input
+            name="category"
             placeholder="Category"
+            value={
+              form.category
+            }
+            onChange={
+              handleChange
+            }
             className="
             w-full
             p-4
@@ -78,18 +202,62 @@ const CreateProductModal = ({
           />
 
           <input
+            name="price"
             placeholder="Price"
+            value={
+              form.price
+            }
+            onChange={
+              handleChange
+            }
             className="
             w-full
             p-4
             rounded-xl
             bg-white/5
             "
+          />
+
+          <input
+            name="stock"
+            placeholder="Stock"
+            value={
+              form.stock
+            }
+            onChange={
+              handleChange
+            }
+            className="
+            w-full
+            p-4
+            rounded-xl
+            bg-white/5
+            "
+          />
+
+          <ImageUploader
+            value={form.images}
+            onChange={(url: string) => {
+              console.log("URL RECEIVED:", url);
+
+              setForm({
+                ...form,
+                images: url,
+              });
+            }
+            }
           />
 
           <textarea
-            rows={5}
+            name="description"
+            rows={4}
             placeholder="Description"
+            value={
+              form.description
+            }
+            onChange={
+              handleChange
+            }
             className="
             w-full
             p-4
@@ -99,6 +267,10 @@ const CreateProductModal = ({
           />
 
           <button
+            type="submit"
+            disabled={
+              loading
+            }
             className="
             w-full
             py-4
@@ -108,9 +280,11 @@ const CreateProductModal = ({
             font-semibold
             "
           >
-            Create Product
+            {loading
+              ? "Creating..."
+              : "Create Product"}
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

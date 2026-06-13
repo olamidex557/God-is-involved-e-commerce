@@ -1,9 +1,13 @@
 interface Props {
   product: any;
+  onDelete: (
+    id: string
+  ) => void;
 }
 
 const ProductCard = ({
   product,
+  onDelete
 }: Props) => {
   return (
     <div
@@ -76,30 +80,59 @@ const ProductCard = ({
 
         <div
           className="
-          mt-5
-          flex
-          justify-between
-          items-center
-          "
+  mt-5
+  flex
+  justify-between
+  items-center
+  "
         >
           <span
             className="
-            text-xl
-            font-bold
-            "
+    text-xl
+    font-bold
+    "
           >
             ₦
             {product.price?.toLocaleString()}
           </span>
 
-          <span
+          <div
             className="
-            text-white/50
-            text-sm
-            "
+    flex
+    gap-2
+    "
           >
-            {product.stock} pcs
-          </span>
+            <button
+              className="
+      px-3
+      py-1
+      rounded-lg
+      bg-blue-500/20
+      text-blue-400
+      text-sm
+      "
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() =>
+                onDelete(
+                  product._id
+                )
+              }
+              className="
+  px-3
+  py-1
+  rounded-lg
+  bg-red-500/20
+  text-red-400
+  text-sm
+  "
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

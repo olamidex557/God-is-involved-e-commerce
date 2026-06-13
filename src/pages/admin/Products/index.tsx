@@ -6,6 +6,9 @@ import ProductGrid from "../../../components/admin/products/ProductGrid";
 import CreateProductModal from "../../../components/admin/products/CreateProductModal";
 
 import { useAdminProducts } from "../../../hooks/products/useAdminProducts";
+import {
+  deleteProduct,
+} from "../../../services/api/adminProducts";
 
 const ProductsAdmin = () => {
   const [open, setOpen] =
@@ -14,8 +17,36 @@ const ProductsAdmin = () => {
   const {
     products,
     loading,
+    fetchProducts,
   } =
     useAdminProducts();
+
+  const handleDelete =
+    async (
+      id: string
+    ) => {
+      const confirmed =
+        window.confirm(
+          "Delete this product?"
+        );
+
+      if (!confirmed)
+        return;
+
+      try {
+        await deleteProduct(
+          id
+        );
+
+        fetchProducts();
+      } catch (
+      error
+      ) {
+        console.error(
+          error
+        );
+      }
+    };
 
   return (
     <>
@@ -78,6 +109,9 @@ const ProductsAdmin = () => {
         ) : (
           <ProductGrid
             products={products}
+            onDelete={
+              handleDelete
+            }
           />
         )}
       </div>
@@ -86,6 +120,9 @@ const ProductsAdmin = () => {
         open={open}
         onClose={() =>
           setOpen(false)
+        }
+        onCreated={
+          fetchProducts
         }
       />
     </>

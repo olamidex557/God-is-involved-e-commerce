@@ -1,7 +1,11 @@
 import { useState } from "react";
 
-import { createProduct, } from "../../../services/api/adminProducts";
-import ImageUploader from "../uploads/ImageUploader";
+import {
+  createProduct,
+} from "../../../services/api/adminProducts";
+
+import MultipleImageUploader
+  from "../uploads/MultipleImageUploader";
 
 interface Props {
   open: boolean;
@@ -27,7 +31,7 @@ const CreateProductModal = ({
       category: "",
       price: "",
       stock: "",
-      images: "",
+      images: [] as string[],
     });
 
   if (!open) return null;
@@ -56,19 +60,27 @@ const CreateProductModal = ({
 
         console.log("FORM:", form);
 
+        if (
+          form.images.length ===
+          0
+        ) {
+          alert(
+            "Upload at least one image"
+          );
+
+          return;
+        }
+
         await createProduct({
           ...form,
-          price:
-            Number(
-              form.price
-            ),
-          stock:
-            Number(
-              form.stock
-            ),
-          images: [
+          price: Number(
+            form.price
+          ),
+          stock: Number(
+            form.stock
+          ),
+          images:
             form.images,
-          ],
         });
 
         onCreated();
@@ -82,7 +94,7 @@ const CreateProductModal = ({
           category: "",
           price: "",
           stock: "",
-          images: "",
+          images: [],
         });
       } catch (
       error
@@ -235,16 +247,20 @@ const CreateProductModal = ({
             "
           />
 
-          <ImageUploader
+          <MultipleImageUploader
             value={form.images}
-            onChange={(url: string) => {
-              console.log("URL RECEIVED:", url);
-
-              setForm({
-                ...form,
-                images: url,
-              });
-            }
+            onChange={(
+              urls: string[]
+            ) =>
+              setForm(
+                (
+                  prev
+                ) => ({
+                  ...prev,
+                  images:
+                    urls,
+                })
+              )
             }
           />
 
@@ -269,16 +285,22 @@ const CreateProductModal = ({
           <button
             type="submit"
             disabled={
-              loading
+              loading ||
+              !form.name ||
+              !form.category ||
+              !form.description ||
+              form.images
+                .length === 0
             }
             className="
-            w-full
-            py-4
-            rounded-xl
-            bg-[#D4AF37]
-            text-black
-            font-semibold
-            "
+  w-full
+  py-4
+  rounded-xl
+  bg-[#D4AF37]
+  text-black
+  font-semibold
+  disabled:opacity-50
+  "
           >
             {loading
               ? "Creating..."

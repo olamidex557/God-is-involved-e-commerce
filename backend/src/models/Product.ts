@@ -33,11 +33,10 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: {
+      type: [String],
+      default: [],
+    },
 
     featured: {
       type: Boolean,

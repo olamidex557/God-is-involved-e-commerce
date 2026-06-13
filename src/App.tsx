@@ -27,6 +27,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import ProductsAdmin from "./pages/admin/Products";
 
 import AdminRouteLayout from "./layouts/AdminRouteLayout";
+import OrdersAdmin from "./pages/admin/Orders";
 
 /* PUBLIC LAYOUT */
 
@@ -129,6 +130,11 @@ function App() {
         <Route
           path="/admin/products"
           element={<ProductsAdmin />}
+        />
+
+        <Route
+          path="/admin/orders"
+          element={<OrdersAdmin />}
         />
       </Route>
     </Routes>

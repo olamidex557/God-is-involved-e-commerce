@@ -1,13 +1,9 @@
+import { Outlet } from "react-router-dom";
+
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
 
-interface Props {
-  children: React.ReactNode;
-}
-
-const AdminLayout = ({
-  children,
-}: Props) => {
+const AdminLayout = () => {
   return (
     <div
       className="
@@ -27,8 +23,8 @@ const AdminLayout = ({
       >
         <AdminTopbar />
 
-        <div className="p-8">
-          {children}
+        <div className="p-8 pt-12">
+          <Outlet />
         </div>
       </main>
     </div>

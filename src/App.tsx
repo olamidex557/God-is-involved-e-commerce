@@ -23,10 +23,10 @@ import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 
-/* ADMIN */
-
 import AdminDashboard from "./pages/admin/Dashboard";
 import ProductsAdmin from "./pages/admin/Products";
+
+import AdminRouteLayout from "./layouts/AdminRouteLayout";
 
 /* PUBLIC LAYOUT */
 
@@ -119,14 +119,18 @@ function App() {
       {/* ADMIN */}
 
       <Route
-        path="/admin/dashboard"
-        element={<AdminDashboard />}
-      />
+        element={<AdminRouteLayout />}
+      >
+        <Route
+          path="/admin/dashboard"
+          element={<AdminDashboard />}
+        />
 
-      <Route
-        path="/admin/products"
-        element={<ProductsAdmin />}
-      />
+        <Route
+          path="/admin/products"
+          element={<ProductsAdmin />}
+        />
+      </Route>
     </Routes>
   );
 }

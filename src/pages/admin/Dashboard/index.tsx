@@ -1,9 +1,94 @@
 import CommandCard from "../../../components/admin/CommandCard";
+import {
+  useDashboardStats,
+} from "../../../hooks/admin/useDashboardStats";
+
+const currencyFormatter =
+  new Intl.NumberFormat(
+    "en-NG",
+    {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0,
+    }
+  );
+
+const numberFormatter =
+  new Intl.NumberFormat(
+    "en-NG"
+  );
 
 const Dashboard = () => {
+  const {
+    stats,
+    loading,
+    error,
+    fetchStats,
+  } = useDashboardStats();
+
+  const getMetricValue =
+    (
+      value:
+        | number
+        | undefined,
+      formatter = numberFormatter
+    ) => {
+      if (loading) {
+        return "Loading...";
+      }
+
+      if (error) {
+        return "Unavailable";
+      }
+
+      return formatter.format(
+        value ?? 0
+      );
+    };
+
   return (
     <>
       {/* STATS */}
+
+      {error && (
+        <div
+          className="
+          mb-6
+          flex
+          flex-col
+          gap-3
+          rounded-2xl
+          border
+          border-red-500/30
+          bg-red-500/10
+          p-4
+          text-sm
+          text-red-100
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+          "
+        >
+          <span>{error}</span>
+
+          <button
+            type="button"
+            onClick={fetchStats}
+            className="
+            rounded-xl
+            bg-white/10
+            px-4
+            py-2
+            font-medium
+            text-white
+            transition
+            hover:bg-white/15
+            "
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       <div
         className="
@@ -15,26 +100,43 @@ const Dashboard = () => {
       >
         <CommandCard
           title="Revenue"
-          value="₦2.4M"
-          growth="+12%"
+          value={getMetricValue(
+            stats?.totalRevenue,
+            currencyFormatter
+          )}
+          growth="Live total"
         />
 
         <CommandCard
           title="Orders"
-          value="324"
-          growth="+18%"
+          value={getMetricValue(
+            stats?.totalOrders
+          )}
+          growth="Live count"
         />
 
         <CommandCard
           title="Quotes"
-          value="125"
-          growth="+8%"
+          value={getMetricValue(
+            stats?.totalQuotations
+          )}
+          growth="Live count"
         />
 
         <CommandCard
           title="Customers"
-          value="842"
-          growth="+15%"
+          value={getMetricValue(
+            stats?.totalUsers
+          )}
+          growth="Live count"
+        />
+
+        <CommandCard
+          title="Products"
+          value={getMetricValue(
+            stats?.totalProducts
+          )}
+          growth="Live count"
         />
       </div>
 

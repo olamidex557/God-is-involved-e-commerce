@@ -7,6 +7,18 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller";
+import {
+  protect,
+} from "../middleware/auth";
+import {
+  requireAdmin,
+} from "../middleware/admin";
+import {
+  validateBody,
+} from "../middleware/validate";
+import {
+  productSchema,
+} from "../validations/product.validation";
 
 const router = Router();
 
@@ -22,16 +34,28 @@ router.get(
 
 router.post(
   "/",
+  protect,
+  requireAdmin,
+  validateBody(
+    productSchema
+  ),
   createProduct
 );
 
 router.put(
   "/:id",
+  protect,
+  requireAdmin,
+  validateBody(
+    productSchema
+  ),
   updateProduct
 );
 
 router.delete(
   "/:id",
+  protect,
+  requireAdmin,
   deleteProduct
 );
 

@@ -6,12 +6,19 @@ import {
 import {
   protect,
 } from "../middleware/auth";
+import {
+  requireAdmin,
+} from "../middleware/admin";
 
 const router = Router();
 
+router.use(
+  protect,
+  requireAdmin
+);
+
 router.get(
   "/stats",
-  protect,
   getAdminStats
 );
 

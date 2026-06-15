@@ -1,39 +1,304 @@
+import {
+  useState,
+} from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
+import AuthLayout from "../../layouts/auth/AuthLayout";
+
+import {
+  register,
+} from "../../services/api/auth";
+
 const Register = () => {
+  const navigate =
+    useNavigate();
+
+  const [
+    firstName,
+    setFirstName,
+  ] = useState("");
+
+  const [
+    lastName,
+    setLastName,
+  ] = useState("");
+
+  const [
+    email,
+    setEmail,
+  ] = useState("");
+
+  const [
+    password,
+    setPassword,
+  ] = useState("");
+
+  const [
+    confirmPassword,
+    setConfirmPassword,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const handleSubmit =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
+
+      setError("");
+
+      if (
+        !firstName ||
+        !lastName ||
+        !email ||
+        !password
+      ) {
+        setError(
+          "Please fill all fields"
+        );
+
+        return;
+      }
+
+      if (
+        password !==
+        confirmPassword
+      ) {
+        setError(
+          "Passwords do not match"
+        );
+
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        await register({
+          firstName,
+          lastName,
+          email,
+          password,
+        });
+
+        navigate(
+          "/login"
+        );
+      } catch (
+        error: any
+      ) {
+        setError(
+          error?.response?.data
+            ?.message ||
+            "Registration failed"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <h1 className="text-5xl font-bold mb-10">
-          Create Account
-        </h1>
-
-        <div className="space-y-4">
+    <AuthLayout
+      title="Create Account"
+      subtitle="Join thousands of builders, contractors and suppliers using God Is Involved."
+    >
+      <form
+        onSubmit={
+          handleSubmit
+        }
+        className="
+        space-y-5
+        "
+      >
+        <div
+          className="
+          grid
+          md:grid-cols-2
+          gap-4
+          "
+        >
           <input
-            placeholder="Full Name"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
+            type="text"
+            placeholder="First Name"
+            value={
+              firstName
+            }
+            onChange={(e) =>
+              setFirstName(
+                e.target.value
+              )
+            }
+            className="
+            h-14
+            px-5
+            rounded-2xl
+            bg-white/5
+            border
+            border-white/10
+            outline-none
+            focus:border-[#D4AF37]
+            "
           />
 
           <input
-            placeholder="Email"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
+            type="text"
+            placeholder="Last Name"
+            value={
+              lastName
+            }
+            onChange={(e) =>
+              setLastName(
+                e.target.value
+              )
+            }
+            className="
+            h-14
+            px-5
+            rounded-2xl
+            bg-white/5
+            border
+            border-white/10
+            outline-none
+            focus:border-[#D4AF37]
+            "
           />
-
-          <input
-            placeholder="Phone Number"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
-          />
-
-          <button className="w-full bg-[#D4AF37] text-black py-4 rounded-full font-semibold">
-            Create Account
-          </button>
         </div>
-      </div>
-    </div>
+
+        <input
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) =>
+            setEmail(
+              e.target.value
+            )
+          }
+          className="
+          w-full
+          h-14
+          px-5
+          rounded-2xl
+          bg-white/5
+          border
+          border-white/10
+          outline-none
+          focus:border-[#D4AF37]
+          "
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={
+            password
+          }
+          onChange={(e) =>
+            setPassword(
+              e.target.value
+            )
+          }
+          className="
+          w-full
+          h-14
+          px-5
+          rounded-2xl
+          bg-white/5
+          border
+          border-white/10
+          outline-none
+          focus:border-[#D4AF37]
+          "
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={
+            confirmPassword
+          }
+          onChange={(e) =>
+            setConfirmPassword(
+              e.target.value
+            )
+          }
+          className="
+          w-full
+          h-14
+          px-5
+          rounded-2xl
+          bg-white/5
+          border
+          border-white/10
+          outline-none
+          focus:border-[#D4AF37]
+          "
+        />
+
+        {error && (
+          <div
+            className="
+            text-red-400
+            text-sm
+            "
+          >
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={
+            loading
+          }
+          className="
+          w-full
+          h-14
+          rounded-2xl
+          bg-[#D4AF37]
+          text-black
+          font-semibold
+          hover:opacity-90
+          transition
+          "
+        >
+          {loading
+            ? "Creating Account..."
+            : "Create Account"}
+        </button>
+
+        <p
+          className="
+          text-center
+          text-white/50
+          "
+        >
+          Already have an
+          account?{" "}
+          <Link
+            to="/login"
+            className="
+            text-[#D4AF37]
+            font-medium
+            "
+          >
+            Sign In
+          </Link>
+        </p>
+      </form>
+    </AuthLayout>
   );
 };
 

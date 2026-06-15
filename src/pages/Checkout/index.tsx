@@ -1,27 +1,168 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
 
 import { useCartStore } from "../../store/cartStore";
+import { useAuth } from "../../context/AuthContext";
+
+import { createOrder } from "../../services/api/orders";
 
 const Checkout = () => {
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
+
   const items = useCartStore(
     (state) => state.items
   );
 
-  const subtotal =
-    items.reduce(
-      (total, item) =>
-        total +
-        item.price *
-          item.quantity,
-      0
-    );
+  const clearCart = useCartStore(
+    (state) => state.clearCart
+  );
+
+  const [firstName, setFirstName] =
+    useState("");
+
+  const [lastName, setLastName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
+
+  const [phone, setPhone] =
+    useState("");
+
+  const [address, setAddress] =
+    useState("");
+
+  const [state, setState] =
+    useState("Lagos");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const subtotal = items.reduce(
+    (total, item) =>
+      total +
+      item.price * item.quantity,
+    0
+  );
+
+  const shippingFee = 0;
+
+  const total =
+    subtotal + shippingFee;
+
+  const handleCheckout =
+    async () => {
+      try {
+        setError("");
+
+        if (!user) {
+          setError(
+            "Please login before placing an order."
+          );
+
+          navigate("/login");
+
+          return;
+        }
+
+        if (
+          !firstName ||
+          !lastName ||
+          !email ||
+          !phone ||
+          !address
+        ) {
+          setError(
+            "Please complete all required fields."
+          );
+
+          return;
+        }
+
+        if (items.length === 0) {
+          setError(
+            "Your cart is empty."
+          );
+
+          return;
+        }
+
+        setLoading(true);
+
+        const payload = {
+          items: items.map(
+            (item) => ({
+              productId: item.id,
+              name: item.name,
+              price: item.price,
+              quantity:
+                item.quantity,
+              image:
+                item.image ?? "",
+            })
+          ),
+
+          subtotal,
+
+          shippingFee,
+
+          totalAmount: total,
+
+          paymentMethod:
+            "paystack",
+
+          shippingAddress: {
+            fullName:
+              `${firstName} ${lastName}`,
+            phone,
+            address,
+            city: state,
+            state,
+          },
+        };
+
+        const response =
+          await createOrder(
+            payload
+          );
+
+        if (
+          response.success
+        ) {
+          clearCart();
+
+          navigate(
+            "/order-success"
+          );
+        }
+      } catch (
+        error: any
+      ) {
+        console.error(
+          error
+        );
+
+        setError(
+          error?.response?.data
+            ?.message ||
+            "Unable to create order."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <div className="pt-32 pb-32">
       <Container>
-        {/* HEADER */}
-
         <div className="mb-16">
           <p
             className="
@@ -47,9 +188,13 @@ const Checkout = () => {
           </h1>
         </div>
 
-        <div className="grid lg:grid-cols-[2fr_1fr] gap-10">
-          {/* CUSTOMER FORM */}
-
+        <div
+          className="
+          grid
+          lg:grid-cols-[2fr_1fr]
+          gap-10
+          "
+        >
           <div
             className="
             border
@@ -66,6 +211,14 @@ const Checkout = () => {
               <input
                 type="text"
                 placeholder="First Name"
+                value={
+                  firstName
+                }
+                onChange={(e) =>
+                  setFirstName(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -77,6 +230,14 @@ const Checkout = () => {
               <input
                 type="text"
                 placeholder="Last Name"
+                value={
+                  lastName
+                }
+                onChange={(e) =>
+                  setLastName(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -88,6 +249,12 @@ const Checkout = () => {
               <input
                 type="email"
                 placeholder="Email Address"
+                value={email}
+                onChange={(e) =>
+                  setEmail(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -100,6 +267,12 @@ const Checkout = () => {
               <input
                 type="tel"
                 placeholder="Phone Number"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -112,6 +285,12 @@ const Checkout = () => {
               <textarea
                 rows={5}
                 placeholder="Delivery Address"
+                value={address}
+                onChange={(e) =>
+                  setAddress(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -122,6 +301,12 @@ const Checkout = () => {
               />
 
               <select
+                value={state}
+                onChange={(e) =>
+                  setState(
+                    e.target.value
+                  )
+                }
                 className="
                 bg-zinc-900
                 rounded-2xl
@@ -147,9 +332,18 @@ const Checkout = () => {
                 </option>
               </select>
             </div>
-          </div>
 
-          {/* SUMMARY */}
+            {error && (
+              <div
+                className="
+                mt-6
+                text-red-400
+                "
+              >
+                {error}
+              </div>
+            )}
+          </div>
 
           <div>
             <div
@@ -227,8 +421,7 @@ const Checkout = () => {
                   </span>
 
                   <span>
-                    Calculated
-                    Later
+                    ₦0
                   </span>
                 </div>
               </div>
@@ -240,26 +433,22 @@ const Checkout = () => {
 
                 <span>
                   ₦
-                  {subtotal.toLocaleString()}
+                  {total.toLocaleString()}
                 </span>
               </div>
 
               <div className="mt-8">
-                <Button className="w-full">
-                  Pay With Paystack
+                <Button
+                  className="w-full"
+                  onClick={
+                    handleCheckout
+                  }
+                >
+                  {loading
+                    ? "Creating Order..."
+                    : "Place Order"}
                 </Button>
               </div>
-
-              <p
-                className="
-                text-white/50
-                text-sm
-                mt-6
-                "
-              >
-                Secure payment powered
-                by Paystack.
-              </p>
             </div>
           </div>
         </div>

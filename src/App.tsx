@@ -25,8 +25,6 @@ import Profile from "./pages/Profile";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 import ProductsAdmin from "./pages/admin/Products";
-
-import AdminRouteLayout from "./layouts/AdminRouteLayout";
 import OrdersAdmin from "./pages/admin/Orders";
 import Inventory from "./pages/admin/Inventory";
 import Quotations from "./pages/admin/Quotations";
@@ -34,10 +32,11 @@ import Users from "./pages/admin/Users";
 import Payments from "./pages/admin/Payments";
 import Delivery from "./pages/admin/Delivery";
 import Settings from "./pages/admin/Settings";
+
+import AdminRouteLayout from "./layouts/AdminRouteLayout";
+
 import ProtectedAdminRoute
   from "./routes/ProtectedAdminRoute";
-
-/* PUBLIC LAYOUT */
 
 function PublicLayout() {
   return (
@@ -56,9 +55,23 @@ function PublicLayout() {
 function App() {
   return (
     <Routes>
+      {/* AUTH PAGES */}
+
+      <Route
+        path="/login"
+        element={<Login />}
+      />
+
+      <Route
+        path="/register"
+        element={<Register />}
+      />
+
       {/* PUBLIC WEBSITE */}
 
-      <Route element={<PublicLayout />}>
+      <Route
+        element={<PublicLayout />}
+      >
         <Route
           path="/"
           element={<Home />}
@@ -97,16 +110,6 @@ function App() {
         <Route
           path="/order-success"
           element={<OrderSuccess />}
-        />
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-        <Route
-          path="/register"
-          element={<Register />}
         />
 
         <Route

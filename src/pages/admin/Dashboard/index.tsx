@@ -244,6 +244,15 @@ const Dashboard = () => {
             </button>
 
             <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+            >
+              Logout Test
+            </button>
+
+            <button
               className="
               w-full
               text-left

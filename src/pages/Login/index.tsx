@@ -1,29 +1,213 @@
+import {
+  useState,
+} from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
+import AuthLayout from "../../layouts/auth/AuthLayout";
+
+import {
+  login,
+} from "../../services/api/auth";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
 const Login = () => {
+  const navigate =
+    useNavigate();
+
+  const {
+    login: loginUser,
+  } = useAuth();
+
+  const [
+    email,
+    setEmail,
+  ] = useState("");
+
+  const [
+    password,
+    setPassword,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const handleSubmit =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
+
+      setError("");
+
+      try {
+        setLoading(true);
+
+        const response =
+          await login(
+            email,
+            password
+          );
+
+        loginUser(
+          response.token,
+          response.user
+        );
+
+        if (
+          response.user.role ===
+          "admin"
+        ) {
+          navigate(
+            "/admin/dashboard"
+          );
+
+          return;
+        }
+
+        navigate("/");
+      } catch (
+        error: any
+      ) {
+        setError(
+          error?.response?.data
+            ?.message ||
+            "Invalid email or password"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <h1 className="text-5xl font-bold mb-10">
-          Welcome Back
-        </h1>
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to manage quotations, orders, deliveries and inventory."
+    >
+      <form
+        onSubmit={
+          handleSubmit
+        }
+        className="
+        space-y-5
+        "
+      >
+        <input
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) =>
+            setEmail(
+              e.target.value
+            )
+          }
+          className="
+          w-full
+          h-14
+          px-5
+          rounded-2xl
+          bg-white/5
+          border
+          border-white/10
+          outline-none
+          focus:border-[#D4AF37]
+          "
+        />
 
-        <div className="space-y-4">
-          <input
-            placeholder="Email"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
-          />
+        <input
+          type="password"
+          placeholder="Password"
+          value={
+            password
+          }
+          onChange={(e) =>
+            setPassword(
+              e.target.value
+            )
+          }
+          className="
+          w-full
+          h-14
+          px-5
+          rounded-2xl
+          bg-white/5
+          border
+          border-white/10
+          outline-none
+          focus:border-[#D4AF37]
+          "
+        />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full bg-zinc-900 p-4 rounded-2xl"
-          />
+        {error && (
+          <div
+            className="
+            text-red-400
+            text-sm
+            "
+          >
+            {error}
+          </div>
+        )}
 
-          <button className="w-full bg-[#D4AF37] text-black py-4 rounded-full font-semibold">
-            Login
-          </button>
+        <button
+          type="submit"
+          disabled={
+            loading
+          }
+          className="
+          w-full
+          h-14
+          rounded-2xl
+          bg-[#D4AF37]
+          text-black
+          font-semibold
+          hover:opacity-90
+          transition
+          "
+        >
+          {loading
+            ? "Signing In..."
+            : "Sign In"}
+        </button>
+
+        <div
+          className="
+          flex
+          items-center
+          justify-center
+          gap-2
+          text-white/50
+          "
+        >
+          <span>
+            Don't have an account?
+          </span>
+
+          <Link
+            to="/register"
+            className="
+            text-[#D4AF37]
+            font-medium
+            "
+          >
+            Create Account
+          </Link>
         </div>
-      </div>
-    </div>
+      </form>
+    </AuthLayout>
   );
 };
 

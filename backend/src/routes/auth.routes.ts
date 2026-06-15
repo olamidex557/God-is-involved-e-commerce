@@ -4,9 +4,13 @@ import {
   register,
   login,
   getMe,
+  verifyOTP,
+  resendOTP,
 } from "../controllers/auth.controller";
 
-import { protect } from "../middleware/auth";
+import {
+  protect,
+} from "../middleware/auth";
 
 const router = Router();
 
@@ -18,6 +22,16 @@ router.post(
 router.post(
   "/login",
   login
+);
+
+router.post(
+  "/verify-otp",
+  verifyOTP
+);
+
+router.post(
+  "/resend-otp",
+  resendOTP
 );
 
 router.get(

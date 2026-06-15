@@ -1,118 +1,333 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+
 import User from "../models/User";
+
 import { generateToken } from "../utils/generateToken";
+
 import { AuthRequest } from "../middleware/auth";
 
-export const register = async (
-    req: Request,
-    res: Response
-) => {
-    try {
-        const {
-            firstName,
-            lastName,
-            email,
-            password,
-        } = req.body;
+import {
+  sendOTPEmail,
+} from "../services/email.service";
 
-        const existingUser =
-            await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: "User already exists",
-            });
-        }
-
-        const hashedPassword =
-            await bcrypt.hash(password, 10);
-
-        const user =
-            await User.create({
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword,
-            });
-
-        res.status(201).json({
-            success: true,
-            message: "Account created successfully",
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-            },
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Server Error",
-        });
-    }
+const generateOTP = () => {
+  return Math.floor(
+    100000 +
+      Math.random() * 900000
+  ).toString();
 };
 
-export const login = async (
+export const register = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+    } = req.body;
+
+    const existingUser =
+      await User.findOne({
+        email,
+      });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "User already exists",
+      });
+    }
+
+    const hashedPassword =
+      await bcrypt.hash(
+        password,
+        10
+      );
+
+    const otp =
+      generateOTP();
+
+    const otpExpiresAt =
+      new Date(
+        Date.now() +
+          10 * 60 * 1000
+      );
+
+    const user =
+      await User.create({
+        firstName,
+        lastName,
+        email,
+        password:
+          hashedPassword,
+
+        verified: false,
+
+        otp,
+
+        otpExpiresAt,
+      });
+
+    await sendOTPEmail(
+      email,
+      otp
+    );
+
+    res.status(201).json({
+      success: true,
+      message:
+        "Account created. Please verify your email.",
+      email:
+        user.email,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Server Error",
+    });
+  }
+};
+
+export const verifyOTP =
+  async (
     req: Request,
     res: Response
-) => {
+  ) => {
     try {
-        const {
-            email,
-            password,
-        } = req.body;
+      const {
+        email,
+        otp,
+      } = req.body;
 
-        const user =
-            await User.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Invalid credentials",
-            });
-        }
-
-        const validPassword =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
-
-        if (!validPassword) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Invalid credentials",
-            });
-        }
-
-        const token =
-            generateToken(
-                user._id.toString()
-            );
-
-        res.json({
-            success: true,
-            token,
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-            },
+      const user =
+        await User.findOne({
+          email,
         });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({
+            success:
+              false,
+            message:
+              "User not found",
+          });
+      }
+
+      if (
+        user.verified
+      ) {
+        return res.json({
+          success: true,
+          message:
+            "Account already verified",
+        });
+      }
+
+      if (
+        user.otp !== otp
+      ) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+            message:
+              "Invalid OTP",
+          });
+      }
+
+      if (
+        !user.otpExpiresAt ||
+        user.otpExpiresAt <
+          new Date()
+      ) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+            message:
+              "OTP expired",
+          });
+      }
+
+      user.verified =
+        true;
+
+      user.otp = null;
+
+      user.otpExpiresAt =
+        null;
+
+      await user.save();
+
+      res.json({
+        success: true,
+        message:
+          "Email verified successfully",
+      });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Server Error",
-        });
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Server Error",
+      });
     }
+  };
+
+export const resendOTP =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const {
+        email,
+      } = req.body;
+
+      const user =
+        await User.findOne({
+          email,
+        });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({
+            success:
+              false,
+            message:
+              "User not found",
+          });
+      }
+
+      const otp =
+        generateOTP();
+
+      user.otp = otp;
+
+      user.otpExpiresAt =
+        new Date(
+          Date.now() +
+            10 *
+              60 *
+              1000
+        );
+
+      await user.save();
+
+      await sendOTPEmail(
+        email,
+        otp
+      );
+
+      res.json({
+        success: true,
+        message:
+          "OTP sent successfully",
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Server Error",
+      });
+    }
+  };
+
+export const login = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      email,
+      password,
+    } = req.body;
+
+    const user =
+      await User.findOne({
+        email,
+      });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid credentials",
+      });
+    }
+
+    const validPassword =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
+    if (
+      !validPassword
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid credentials",
+      });
+    }
+
+    if (
+      !user.verified
+    ) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Please verify your email first",
+      });
+    }
+
+    const token =
+      generateToken(
+        user._id.toString()
+      );
+
+    res.json({
+      success: true,
+      token,
+
+      user: {
+        id: user._id,
+        firstName:
+          user.firstName,
+        lastName:
+          user.lastName,
+        email:
+          user.email,
+        role:
+          user.role,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Server Error",
+    });
+  }
 };
 
 export const getMe = async (
@@ -123,7 +338,9 @@ export const getMe = async (
     const user =
       await User.findById(
         req.userId
-      ).select("-password");
+      ).select(
+        "-password"
+      );
 
     res.json({
       success: true,
@@ -132,7 +349,8 @@ export const getMe = async (
   } catch {
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message:
+        "Server Error",
     });
   }
 };

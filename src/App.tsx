@@ -18,6 +18,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import VerifyOTP from "./pages/VerifyOTP";
 
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
@@ -65,6 +66,11 @@ function App() {
       <Route
         path="/register"
         element={<Register />}
+      />
+
+      <Route
+        path="/verify-otp"
+        element={<VerifyOTP />}
       />
 
       {/* PUBLIC WEBSITE */}

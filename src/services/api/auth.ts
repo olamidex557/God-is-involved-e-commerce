@@ -1,12 +1,5 @@
 import { api } from "./client";
 
-interface RegisterData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
-
 export const login =
   async (
     email: string,
@@ -26,12 +19,49 @@ export const login =
 
 export const register =
   async (
-    data: RegisterData
+    data: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+    }
   ) => {
     const response =
       await api.post(
         "/auth/register",
         data
+      );
+
+    return response.data;
+  };
+
+export const verifyOTP =
+  async (
+    email: string,
+    otp: string
+  ) => {
+    const response =
+      await api.post(
+        "/auth/verify-otp",
+        {
+          email,
+          otp,
+        }
+      );
+
+    return response.data;
+  };
+
+export const resendOTP =
+  async (
+    email: string
+  ) => {
+    const response =
+      await api.post(
+        "/auth/resend-otp",
+        {
+          email,
+        }
       );
 
     return response.data;

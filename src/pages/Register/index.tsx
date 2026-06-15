@@ -95,7 +95,9 @@ const Register = () => {
         });
 
         navigate(
-          "/login"
+          `/verify-otp?email=${encodeURIComponent(
+            email
+          )}`
         );
       } catch (
         error: any
@@ -119,9 +121,7 @@ const Register = () => {
         onSubmit={
           handleSubmit
         }
-        className="
-        space-y-5
-        "
+        className="space-y-5"
       >
         <div
           className="

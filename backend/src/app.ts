@@ -6,6 +6,7 @@ import productRoutes from "./routes/product.routes";
 import uploadRoutes from "./routes/upload.routes";
 import adminRoutes from "./routes/admin.routes";
 import orderRoutes from "./routes/order.routes";
+import userRoutes from "./routes/user.routes";
 
 const app = express();
 
@@ -47,6 +48,11 @@ app.use(
 app.use(
   "/api/orders",
   orderRoutes
+);
+
+app.use(
+  "/api/users",
+  userRoutes
 );
 
 export default app;

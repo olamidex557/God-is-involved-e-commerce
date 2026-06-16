@@ -1,4 +1,35 @@
-const UserStats = () => {
+interface Props {
+  totalUsers: number;
+  vipCustomers: number;
+  newCustomers: number;
+  totalRevenue: number;
+}
+
+const UserStats = ({
+  totalUsers,
+  vipCustomers,
+  newCustomers,
+  totalRevenue,
+}: Props) => {
+  const stats = [
+    {
+      title: "Customers",
+      value: totalUsers,
+    },
+    {
+      title: "VIP Clients",
+      value: vipCustomers,
+    },
+    {
+      title: "New This Month",
+      value: newCustomers,
+    },
+    {
+      title: "Customer Revenue",
+      value: `₦${totalRevenue.toLocaleString()}`,
+    },
+  ];
+
   return (
     <div
       className="
@@ -7,28 +38,7 @@ const UserStats = () => {
       gap-6
       "
     >
-      {[
-        {
-          title:
-            "Customers",
-          value: "842",
-        },
-        {
-          title:
-            "VIP Clients",
-          value: "43",
-        },
-        {
-          title:
-            "New This Month",
-          value: "87",
-        },
-        {
-          title:
-            "Retention",
-          value: "92%",
-        },
-      ].map((item) => (
+      {stats.map((item) => (
         <div
           key={item.title}
           className="

@@ -1,12 +1,34 @@
-const activities = [
-  "Olamide placed an order",
-  "TechHub requested a quote",
-  "James completed payment",
-  "Sarah registered",
-  "David updated profile",
-];
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: string;
+}
 
-const UserActivity = () => {
+interface Props {
+  users: User[];
+}
+
+const UserActivity = ({
+  users,
+}: Props) => {
+  const recentUsers =
+    [...users]
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          new Date(
+            b.createdAt
+          ).getTime() -
+          new Date(
+            a.createdAt
+          ).getTime()
+      )
+      .slice(0, 10);
+
   return (
     <div
       className="
@@ -24,37 +46,87 @@ const UserActivity = () => {
         mb-6
         "
       >
-        Customer Activity
+        Recent Customer Activity
       </h2>
 
-      <div className="space-y-4">
-        {activities.map(
-          (
-            activity,
-            index
-          ) => (
-            <div
-              key={index}
-              className="
-              flex
-              items-center
-              gap-3
-              "
-            >
+      {recentUsers.length ===
+      0 ? (
+        <p className="text-white/50">
+          No customer activity.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {recentUsers.map(
+            (user) => (
               <div
+                key={
+                  user._id
+                }
                 className="
-                w-2
-                h-2
-                rounded-full
-                bg-[#D4AF37]
+                flex
+                items-start
+                gap-4
+                border-b
+                border-white/10
+                pb-4
                 "
-              />
+              >
+                <div
+                  className="
+                  w-10
+                  h-10
+                  rounded-full
+                  bg-[#D4AF37]
+                  text-black
+                  font-bold
+                  flex
+                  items-center
+                  justify-center
+                  "
+                >
+                  {user.firstName?.[0]}
+                  {user.lastName?.[0]}
+                </div>
 
-              <p>{activity}</p>
-            </div>
-          )
-        )}
-      </div>
+                <div>
+                  <p className="font-medium">
+                    {
+                      user.firstName
+                    }{" "}
+                    {
+                      user.lastName
+                    }
+                  </p>
+
+                  <p
+                    className="
+                    text-sm
+                    text-white/50
+                    "
+                  >
+                    {
+                      user.email
+                    }
+                  </p>
+
+                  <p
+                    className="
+                    text-xs
+                    text-[#D4AF37]
+                    mt-1
+                    "
+                  >
+                    Registered{" "}
+                    {new Date(
+                      user.createdAt
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 };

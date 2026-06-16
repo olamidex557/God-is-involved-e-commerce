@@ -1,8 +1,10 @@
 interface Props {
   order: {
     id: string;
+    orderNumber: string;
     customer: string;
     amount: string;
+    status: string;
   };
 }
 
@@ -17,18 +19,19 @@ const OrderCard = ({
       border-white/10
       rounded-2xl
       p-4
-      cursor-pointer
       hover:border-[#D4AF37]
       transition
       "
     >
       <p
         className="
-        text-sm
-        text-white/50
+        text-xs
+        text-white/40
         "
       >
-        {order.id}
+        {
+          order.orderNumber
+        }
       </p>
 
       <h3
@@ -37,16 +40,21 @@ const OrderCard = ({
         mt-2
         "
       >
-        {order.customer}
+        {
+          order.customer
+        }
       </h3>
 
       <p
         className="
         mt-3
         text-[#D4AF37]
+        font-medium
         "
       >
-        {order.amount}
+        {
+          order.amount
+        }
       </p>
     </div>
   );

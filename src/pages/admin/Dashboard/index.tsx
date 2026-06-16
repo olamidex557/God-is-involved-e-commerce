@@ -1,4 +1,5 @@
 import CommandCard from "../../../components/admin/CommandCard";
+
 import {
   useDashboardStats,
 } from "../../../hooks/admin/useDashboardStats";
@@ -26,176 +27,288 @@ const Dashboard = () => {
     fetchStats,
   } = useDashboardStats();
 
-  const getMetricValue =
+  const formatNumber =
     (
-      value:
-        | number
-        | undefined,
-      formatter = numberFormatter
+      value?: number
     ) => {
-      if (loading) {
+      if (loading)
         return "Loading...";
-      }
 
-      if (error) {
-        return "Unavailable";
-      }
+      return numberFormatter.format(
+        value || 0
+      );
+    };
 
-      return formatter.format(
-        value ?? 0
+  const formatMoney =
+    (
+      value?: number
+    ) => {
+      if (loading)
+        return "Loading...";
+
+      return currencyFormatter.format(
+        value || 0
       );
     };
 
   return (
     <>
-      {/* STATS */}
+      {/* HEADER */}
+
+      <div className="mb-10">
+        <h1
+          className="
+          text-4xl
+          font-bold
+          "
+        >
+          Command Center
+        </h1>
+
+        <p
+          className="
+          text-white/50
+          mt-2
+          "
+        >
+          Real-time overview
+          of orders,
+          inventory and
+          customer activity.
+        </p>
+      </div>
+
+      {/* ERROR */}
 
       {error && (
         <div
           className="
           mb-6
-          flex
-          flex-col
-          gap-3
+          p-4
           rounded-2xl
           border
           border-red-500/30
           bg-red-500/10
-          p-4
-          text-sm
-          text-red-100
-          sm:flex-row
-          sm:items-center
-          sm:justify-between
           "
         >
-          <span>{error}</span>
-
-          <button
-            type="button"
-            onClick={fetchStats}
+          <div
             className="
-            rounded-xl
-            bg-white/10
-            px-4
-            py-2
-            font-medium
-            text-white
-            transition
-            hover:bg-white/15
+            flex
+            justify-between
+            items-center
             "
           >
-            Retry
-          </button>
+            <span>
+              {error}
+            </span>
+
+            <button
+              onClick={
+                fetchStats
+              }
+            >
+              Retry
+            </button>
+          </div>
         </div>
       )}
 
+      {/* TOP STATS */}
+
       <div
         className="
+        grid
+        md:grid-cols-2
+        xl:grid-cols-5
+        gap-6
+        "
+      >
+        <CommandCard
+          title="Revenue"
+          value={formatMoney(
+            stats?.totalRevenue
+          )}
+          growth="Total sales"
+        />
+
+        <CommandCard
+          title="Orders"
+          value={formatNumber(
+            stats?.totalOrders
+          )}
+          growth="All orders"
+        />
+
+        <CommandCard
+          title="Customers"
+          value={formatNumber(
+            stats?.totalUsers
+          )}
+          growth="Registered users"
+        />
+
+        <CommandCard
+          title="Products"
+          value={formatNumber(
+            stats?.totalProducts
+          )}
+          growth="Inventory items"
+        />
+
+        <CommandCard
+          title="Low Stock"
+          value={formatNumber(
+            stats
+              ?.lowStockProducts
+              ?.length
+          )}
+          growth="Requires attention"
+        />
+      </div>
+
+      {/* ORDER PIPELINE */}
+
+      <div
+        className="
+        mt-8
         grid
         md:grid-cols-2
         xl:grid-cols-4
         gap-6
         "
       >
-        <CommandCard
-          title="Revenue"
-          value={getMetricValue(
-            stats?.totalRevenue,
-            currencyFormatter
-          )}
-          growth="Live total"
-        />
+        <div
+          className="
+          rounded-3xl
+          border
+          border-yellow-500/20
+          bg-yellow-500/10
+          p-6
+          "
+        >
+          <p
+            className="
+            text-yellow-400
+            "
+          >
+            Pending
+          </p>
 
-        <CommandCard
-          title="Orders"
-          value={getMetricValue(
-            stats?.totalOrders
-          )}
-          growth="Live count"
-        />
+          <h3
+            className="
+            text-4xl
+            font-bold
+            mt-3
+            "
+          >
+            {formatNumber(
+              stats?.pendingOrders
+            )}
+          </h3>
+        </div>
 
-        <CommandCard
-          title="Quotes"
-          value={getMetricValue(
-            stats?.totalQuotations
-          )}
-          growth="Live count"
-        />
+        <div
+          className="
+          rounded-3xl
+          border
+          border-blue-500/20
+          bg-blue-500/10
+          p-6
+          "
+        >
+          <p
+            className="
+            text-blue-400
+            "
+          >
+            Processing
+          </p>
 
-        <CommandCard
-          title="Customers"
-          value={getMetricValue(
-            stats?.totalUsers
-          )}
-          growth="Live count"
-        />
+          <h3
+            className="
+            text-4xl
+            font-bold
+            mt-3
+            "
+          >
+            {formatNumber(
+              stats?.processingOrders
+            )}
+          </h3>
+        </div>
 
-        <CommandCard
-          title="Products"
-          value={getMetricValue(
-            stats?.totalProducts
-          )}
-          growth="Live count"
-        />
+        <div
+          className="
+          rounded-3xl
+          border
+          border-purple-500/20
+          bg-purple-500/10
+          p-6
+          "
+        >
+          <p
+            className="
+            text-purple-400
+            "
+          >
+            Shipped
+          </p>
+
+          <h3
+            className="
+            text-4xl
+            font-bold
+            mt-3
+            "
+          >
+            {formatNumber(
+              stats?.shippedOrders
+            )}
+          </h3>
+        </div>
+
+        <div
+          className="
+          rounded-3xl
+          border
+          border-green-500/20
+          bg-green-500/10
+          p-6
+          "
+        >
+          <p
+            className="
+            text-green-400
+            "
+          >
+            Delivered
+          </p>
+
+          <h3
+            className="
+            text-4xl
+            font-bold
+            mt-3
+            "
+          >
+            {formatNumber(
+              stats?.deliveredOrders
+            )}
+          </h3>
+        </div>
       </div>
 
-      {/* WORKSPACE */}
+      {/* MAIN GRID */}
 
       <div
         className="
         mt-8
         grid
-        lg:grid-cols-3
+        xl:grid-cols-2
         gap-6
         "
       >
-        {/* ACTIVITY */}
-
-        <div
-          className="
-          lg:col-span-2
-          bg-white/5
-          border
-          border-white/10
-          rounded-3xl
-          p-6
-          "
-        >
-          <h2
-            className="
-            text-xl
-            font-semibold
-            mb-6
-            "
-          >
-            Live Activity
-          </h2>
-
-          <div className="space-y-4">
-            <div className="border-b border-white/10 pb-3">
-              New quote submitted
-            </div>
-
-            <div className="border-b border-white/10 pb-3">
-              Order #102 paid
-            </div>
-
-            <div className="border-b border-white/10 pb-3">
-              Inventory updated
-            </div>
-
-            <div className="border-b border-white/10 pb-3">
-              New customer registered
-            </div>
-
-            <div>
-              Delivery marked complete
-            </div>
-          </div>
-        </div>
-
-        {/* AI PANEL */}
+        {/* RECENT ORDERS */}
 
         <div
           className="
@@ -213,90 +326,73 @@ const Dashboard = () => {
             mb-6
             "
           >
-            AI Assistant
-          </h2>
-
-          <div className="space-y-3">
-            <button
-              className="
-              w-full
-              text-left
-              p-3
-              rounded-xl
-              bg-white/5
-              hover:bg-white/10
-              "
-            >
-              Show low stock items
-            </button>
-
-            <button
-              className="
-              w-full
-              text-left
-              p-3
-              rounded-xl
-              bg-white/5
-              hover:bg-white/10
-              "
-            >
-              Show pending orders
-            </button>
-
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.reload();
-              }}
-            >
-              Logout Test
-            </button>
-
-            <button
-              className="
-              w-full
-              text-left
-              p-3
-              rounded-xl
-              bg-white/5
-              hover:bg-white/10
-              "
-            >
-              Generate report
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* LOWER GRID */}
-
-      <div
-        className="
-        mt-6
-        grid
-        md:grid-cols-2
-        gap-6
-        "
-      >
-        <div
-          className="
-          bg-white/5
-          border
-          border-white/10
-          rounded-3xl
-          p-6
-          "
-        >
-          <h2 className="text-xl font-semibold mb-4">
             Recent Orders
           </h2>
 
-          <div className="space-y-3">
-            <p>#102 • ₦45,000</p>
-            <p>#101 • ₦22,000</p>
-            <p>#100 • ₦89,000</p>
+          <div className="space-y-4">
+            {stats?.recentOrders
+              ?.length ? (
+              stats.recentOrders.map(
+                (
+                  order
+                ) => (
+                  <div
+                    key={
+                      order._id
+                    }
+                    className="
+                    flex
+                    justify-between
+                    items-center
+                    border-b
+                    border-white/10
+                    pb-4
+                    "
+                  >
+                    <div>
+                      <p
+                        className="
+                        font-medium
+                        "
+                      >
+                        {
+                          order.orderNumber
+                        }
+                      </p>
+
+                      <p
+                        className="
+                        text-sm
+                        text-white/50
+                        "
+                      >
+                        {
+                          order.status
+                        }
+                      </p>
+                    </div>
+
+                    <div>
+                      {currencyFormatter.format(
+                        order.totalAmount
+                      )}
+                    </div>
+                  </div>
+                )
+              )
+            ) : (
+              <p
+                className="
+                text-white/50
+                "
+              >
+                No orders found.
+              </p>
+            )}
           </div>
         </div>
+
+        {/* LOW STOCK */}
 
         <div
           className="
@@ -307,14 +403,65 @@ const Dashboard = () => {
           p-6
           "
         >
-          <h2 className="text-xl font-semibold mb-4">
+          <h2
+            className="
+            text-xl
+            font-semibold
+            mb-6
+            "
+          >
             Low Stock Alerts
           </h2>
 
-          <div className="space-y-3">
-            <p>Walnut MDF</p>
-            <p>Oak Veneer</p>
-            <p>Black Edge Tape</p>
+          <div className="space-y-4">
+            {stats
+              ?.lowStockProducts
+              ?.length ? (
+              stats.lowStockProducts.map(
+                (
+                  product
+                ) => (
+                  <div
+                    key={
+                      product._id
+                    }
+                    className="
+                    flex
+                    justify-between
+                    items-center
+                    border-b
+                    border-white/10
+                    pb-4
+                    "
+                  >
+                    <span>
+                      {
+                        product.name
+                      }
+                    </span>
+
+                    <span
+                      className="
+                      text-red-400
+                      "
+                    >
+                      {
+                        product.stock
+                      }{" "}
+                      left
+                    </span>
+                  </div>
+                )
+              )
+            ) : (
+              <p
+                className="
+                text-white/50
+                "
+              >
+                Inventory healthy.
+              </p>
+            )}
           </div>
         </div>
       </div>

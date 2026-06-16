@@ -7,13 +7,17 @@ export const getProducts = async (
 ) => {
   try {
     const products =
-      await Product.find();
+      await Product.find().sort({
+        createdAt: -1,
+      });
 
     res.json({
       success: true,
       products,
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -65,7 +69,9 @@ export const getProductById = async (
       success: true,
       product,
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message:
@@ -100,7 +106,9 @@ export const updateProduct = async (
       success: true,
       product,
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message:
@@ -108,6 +116,50 @@ export const updateProduct = async (
     });
   }
 };
+
+export const updateProductStock =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const {
+        stock,
+      } = req.body;
+
+      const product =
+        await Product.findByIdAndUpdate(
+          req.params.id,
+          {
+            stock,
+          },
+          {
+            new: true,
+          }
+        );
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Product not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        product,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Failed to update stock",
+      });
+    }
+  };
 
 export const deleteProduct = async (
   req: Request,
@@ -132,7 +184,9 @@ export const deleteProduct = async (
       message:
         "Product deleted",
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message:

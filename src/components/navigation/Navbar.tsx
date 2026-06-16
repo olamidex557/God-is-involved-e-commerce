@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   Link,
   useLocation,
@@ -9,11 +10,18 @@ import {
   X,
   ShoppingBag,
   LayoutDashboard,
+  User,
+  LogOut,
+  Package,
 } from "lucide-react";
 
 import logo from "../../assets/images/logo/logo.png";
 
 import { useCartStore } from "../../store/cartStore";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
 
 const Navbar = () => {
   const [open, setOpen] =
@@ -21,6 +29,11 @@ const Navbar = () => {
 
   const location =
     useLocation();
+
+  const {
+    user,
+    logout,
+  } = useAuth();
 
   const cartItems =
     useCartStore(
@@ -53,6 +66,12 @@ const Navbar = () => {
     },
   ];
 
+  const handleLogout =
+    () => {
+      logout();
+      setOpen(false);
+    };
+
   return (
     <>
       {/* NAVBAR */}
@@ -71,7 +90,7 @@ const Navbar = () => {
             className="
             h-20
             rounded-full
-            bg-black/30
+            bg-black/40
             backdrop-blur-2xl
             border
             border-white/10
@@ -84,7 +103,13 @@ const Navbar = () => {
           >
             {/* LOGO */}
 
-            <Link to="/" className="flex items-center">
+            <Link
+              to="/"
+              className="
+              flex
+              items-center
+              "
+            >
               <img
                 src={logo}
                 alt="God Is Involved"
@@ -132,22 +157,130 @@ const Navbar = () => {
               )}
             </nav>
 
-            {/* RIGHT */}
+            {/* RIGHT SIDE */}
 
-            <div className="flex items-center gap-5">
-              {/* DASHBOARD */}
+            <div
+              className="
+              flex
+              items-center
+              gap-4
+              "
+            >
+              {/* GUEST */}
 
-              <Link
-                to="/dashboard"
-                className="
-                hidden
-                md:flex
-                "
-              >
-                <LayoutDashboard
-                  size={22}
-                />
-              </Link>
+              {!user && (
+                <>
+                  <Link
+                    to="/login"
+                    className="
+                    hidden
+                    md:flex
+                    text-sm
+                    hover:text-[#D4AF37]
+                    transition
+                    "
+                  >
+                    Login
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="
+                    hidden
+                    md:flex
+                    items-center
+                    justify-center
+                    px-5
+                    py-2
+                    rounded-full
+                    bg-[#D4AF37]
+                    text-black
+                    font-semibold
+                    "
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+
+              {/* CUSTOMER */}
+
+              {user && (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-2
+                    text-sm
+                    hover:text-[#D4AF37]
+                    transition
+                    "
+                  >
+                    <User
+                      size={18}
+                    />
+
+                    <span>
+                      {
+                        user.firstName
+                      }
+                    </span>
+                  </Link>
+
+                  <Link
+                    to="/orders"
+                    className="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-2
+                    text-sm
+                    hover:text-[#D4AF37]
+                    transition
+                    "
+                  >
+                    <Package
+                      size={18}
+                    />
+
+                    Orders
+                  </Link>
+
+                  {user.role ===
+                    "admin" && (
+                    <Link
+                      to="/admin/dashboard"
+                      className="
+                      hidden
+                      md:flex
+                      "
+                    >
+                      <LayoutDashboard
+                        size={20}
+                      />
+                    </Link>
+                  )}
+
+                  <button
+                    onClick={
+                      handleLogout
+                    }
+                    className="
+                    hidden
+                    md:flex
+                    hover:text-red-400
+                    transition
+                    "
+                  >
+                    <LogOut
+                      size={20}
+                    />
+                  </button>
+                </>
+              )}
 
               {/* CART */}
 
@@ -161,7 +294,8 @@ const Navbar = () => {
                   size={24}
                 />
 
-                {totalItems > 0 && (
+                {totalItems >
+                  0 && (
                   <span
                     className="
                     absolute
@@ -179,7 +313,9 @@ const Navbar = () => {
                     justify-center
                     "
                   >
-                    {totalItems}
+                    {
+                      totalItems
+                    }
                   </span>
                 )}
               </Link>
@@ -194,7 +330,9 @@ const Navbar = () => {
                   setOpen(true)
                 }
               >
-                <Menu size={28} />
+                <Menu
+                  size={28}
+                />
               </button>
             </div>
           </div>
@@ -221,7 +359,13 @@ const Navbar = () => {
         <div className="p-8">
           {/* TOP */}
 
-          <div className="flex justify-between items-center">
+          <div
+            className="
+            flex
+            justify-between
+            items-center
+            "
+          >
             <img
               src={logo}
               alt=""
@@ -233,7 +377,9 @@ const Navbar = () => {
                 setOpen(false)
               }
             >
-              <X size={30} />
+              <X
+                size={30}
+              />
             </button>
           </div>
 
@@ -266,19 +412,6 @@ const Navbar = () => {
             )}
 
             <Link
-              to="/dashboard"
-              onClick={() =>
-                setOpen(false)
-              }
-              className="
-              text-4xl
-              font-bold
-              "
-            >
-              Dashboard
-            </Link>
-
-            <Link
               to="/cart"
               onClick={() =>
                 setOpen(false)
@@ -290,6 +423,108 @@ const Navbar = () => {
             >
               Cart
             </Link>
+
+            {!user ? (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  "
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  text-[#D4AF37]
+                  "
+                >
+                  Register
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/dashboard"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  "
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  to="/orders"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  "
+                >
+                  Orders
+                </Link>
+
+                <Link
+                  to="/profile"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="
+                  text-4xl
+                  font-bold
+                  "
+                >
+                  Profile
+                </Link>
+
+                {user.role ===
+                  "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() =>
+                      setOpen(false)
+                    }
+                    className="
+                    text-4xl
+                    font-bold
+                    "
+                  >
+                    Admin
+                  </Link>
+                )}
+
+                <button
+                  onClick={
+                    handleLogout
+                  }
+                  className="
+                  text-left
+                  text-4xl
+                  font-bold
+                  text-red-400
+                  "
+                >
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

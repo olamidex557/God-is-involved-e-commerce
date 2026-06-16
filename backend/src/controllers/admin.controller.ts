@@ -3,122 +3,114 @@ import mongoose from "mongoose";
 
 import Product from "../models/Product";
 import User from "../models/User";
-
-type RevenueAggregationResult = {
-  totalOrders: number;
-  totalRevenue: number;
-};
-
-const getCollectionCount = async (
-  collectionName: string
-) => {
-  const collections =
-    await mongoose.connection.db
-      ?.listCollections({
-        name: collectionName,
-      })
-      .toArray();
-
-  if (!collections?.length) {
-    return 0;
-  }
-
-  return mongoose.connection
-    .collection(collectionName)
-    .countDocuments();
-};
+import Order from "../models/Order";
 
 export const getAdminStats = async (
   _req: Request,
   res: Response
 ) => {
   try {
-    const ordersCollection =
-      mongoose.connection.collection(
-        "orders"
-      );
-
     const [
       totalProducts,
       totalUsers,
-      totalQuotations,
-      orderStats,
+      totalOrders,
+
+      totalRevenue,
+
+      pendingOrders,
+      processingOrders,
+      shippedOrders,
+      deliveredOrders,
+
+      lowStockProducts,
+
+      recentOrders,
     ] = await Promise.all([
       Product.countDocuments(),
+
       User.countDocuments(),
-      getCollectionCount(
-        "quotes"
-      ),
-      ordersCollection
-        .aggregate<RevenueAggregationResult>(
-          [
-            {
-              $group: {
-                _id: null,
-                totalOrders: {
-                  $sum: 1,
-                },
-                totalRevenue: {
-                  $sum: {
-                    $convert: {
-                      input: {
-                        $ifNull: [
-                          "$totalRevenue",
-                          {
-                            $ifNull: [
-                              "$revenue",
-                              {
-                                $ifNull: [
-                                  "$totalAmount",
-                                  {
-                                    $ifNull: [
-                                      "$total",
-                                      "$amount",
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
-                  },
-                },
-              },
+
+      Order.countDocuments(),
+
+      Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            revenue: {
+              $sum:
+                "$totalAmount",
             },
-            {
-              $project: {
-                _id: 0,
-                totalOrders: 1,
-                totalRevenue: 1,
-              },
-            },
-          ]
-        )
-        .toArray(),
+          },
+        },
+      ]),
+
+      Order.countDocuments({
+        status:
+          "pending",
+      }),
+
+      Order.countDocuments({
+        status:
+          "processing",
+      }),
+
+      Order.countDocuments({
+        status:
+          "shipped",
+      }),
+
+      Order.countDocuments({
+        status:
+          "delivered",
+      }),
+
+      Product.find({
+        stock: {
+          $lte: 10,
+        },
+      })
+        .sort({
+          stock: 1,
+        })
+        .limit(10),
+
+      Order.find()
+        .sort({
+          createdAt: -1,
+        })
+        .limit(10)
+        .select(
+          "orderNumber totalAmount status createdAt"
+        ),
     ]);
 
-    const stats =
-      orderStats[0] ?? {
-        totalOrders: 0,
-        totalRevenue: 0,
-      };
+    const revenue =
+      totalRevenue[0]
+        ?.revenue || 0;
 
     res.json({
       totalProducts,
-      totalOrders:
-        stats.totalOrders,
       totalUsers,
-      totalQuotations,
+      totalOrders,
+
       totalRevenue:
-        stats.totalRevenue,
+        revenue,
+
+      totalQuotations: 0,
+
+      pendingOrders,
+      processingOrders,
+      shippedOrders,
+      deliveredOrders,
+
+      lowStockProducts,
+
+      recentOrders,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      error
+    );
 
     res.status(500).json({
       success: false,

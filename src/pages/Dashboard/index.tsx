@@ -1,18 +1,98 @@
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { Link } from "react-router-dom";
+
 import Container from "../../components/ui/Container";
 
+import {
+  getMyOrders,
+} from "../../services/api/orders";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
 const Dashboard = () => {
+  const { user } =
+    useAuth();
+
+  const [
+    orders,
+    setOrders,
+  ] = useState<any[]>([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  useEffect(() => {
+    const loadOrders =
+      async () => {
+        try {
+          const response =
+            await getMyOrders();
+
+          setOrders(
+            response.orders || []
+          );
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    loadOrders();
+  }, []);
+
+  const totalOrders =
+    orders.length;
+
+  const pendingOrders =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "pending"
+    ).length;
+
+  const deliveredOrders =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "delivered"
+    ).length;
+
+  const totalSpent =
+    orders.reduce(
+      (
+        total,
+        order
+      ) =>
+        total +
+        order.totalAmount,
+      0
+    );
+
   return (
-    <div className="pt-32 pb-32">
+    <div className="pt-32 pb-24">
       <Container>
         {/* HEADER */}
 
-        <div className="mb-16">
+        <div className="mb-12">
           <p
             className="
             uppercase
             tracking-[0.3em]
             text-[#D4AF37]
-            mb-4
+            mb-3
             "
           >
             Dashboard
@@ -20,139 +100,243 @@ const Dashboard = () => {
 
           <h1
             className="
-            text-5xl
-            md:text-7xl
+            text-4xl
+            md:text-6xl
             font-bold
             "
           >
-            Welcome Back
+            Welcome Back,
+            <br />
+            {
+              user?.firstName
+            }
           </h1>
         </div>
 
-        {/* OVERVIEW CARDS */}
+        {/* STATS */}
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="border border-white/10 rounded-[32px] p-8">
+        <div
+          className="
+          grid
+          md:grid-cols-2
+          xl:grid-cols-4
+          gap-6
+          "
+        >
+          <div
+            className="
+            bg-white/[0.03]
+            border
+            border-white/10
+            rounded-3xl
+            p-8
+            "
+          >
             <h3 className="text-4xl font-bold">
-              12
+              {totalOrders}
             </h3>
 
-            <p className="text-white/60 mt-3">
-              Orders
+            <p className="text-white/50 mt-2">
+              Total Orders
             </p>
           </div>
 
-          <div className="border border-white/10 rounded-[32px] p-8">
+          <div
+            className="
+            bg-white/[0.03]
+            border
+            border-white/10
+            rounded-3xl
+            p-8
+            "
+          >
             <h3 className="text-4xl font-bold">
-              4
+              {
+                pendingOrders
+              }
             </h3>
 
-            <p className="text-white/60 mt-3">
-              Saved Quotes
+            <p className="text-white/50 mt-2">
+              Pending Orders
             </p>
           </div>
 
-          <div className="border border-white/10 rounded-[32px] p-8">
+          <div
+            className="
+            bg-white/[0.03]
+            border
+            border-white/10
+            rounded-3xl
+            p-8
+            "
+          >
             <h3 className="text-4xl font-bold">
-              ₦1.2M
+              {
+                deliveredOrders
+              }
             </h3>
 
-            <p className="text-white/60 mt-3">
-              Total Purchases
+            <p className="text-white/50 mt-2">
+              Delivered
             </p>
           </div>
 
-          <div className="border border-white/10 rounded-[32px] p-8">
+          <div
+            className="
+            bg-white/[0.03]
+            border
+            border-white/10
+            rounded-3xl
+            p-8
+            "
+          >
             <h3 className="text-4xl font-bold">
-              2
+              ₦
+              {totalSpent.toLocaleString()}
             </h3>
 
-            <p className="text-white/60 mt-3">
-              Addresses
+            <p className="text-white/50 mt-2">
+              Total Spend
             </p>
+          </div>
+        </div>
+
+        {/* QUICK ACTIONS */}
+
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">
+            Quick Actions
+          </h2>
+
+          <div
+            className="
+            grid
+            md:grid-cols-3
+            gap-6
+            "
+          >
+            <Link
+              to="/materials"
+              className="
+              border
+              border-white/10
+              rounded-3xl
+              p-8
+              hover:border-[#D4AF37]
+              transition
+              "
+            >
+              Browse Materials
+            </Link>
+
+            <Link
+              to="/quotation"
+              className="
+              border
+              border-white/10
+              rounded-3xl
+              p-8
+              hover:border-[#D4AF37]
+              transition
+              "
+            >
+              Request Quotation
+            </Link>
+
+            <Link
+              to="/orders"
+              className="
+              border
+              border-white/10
+              rounded-3xl
+              p-8
+              hover:border-[#D4AF37]
+              transition
+              "
+            >
+              My Orders
+            </Link>
           </div>
         </div>
 
         {/* RECENT ORDERS */}
 
-        <div className="mt-20">
-          <h2 className="text-3xl font-bold mb-8">
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6">
             Recent Orders
           </h2>
 
-          <div className="border border-white/10 rounded-[32px] overflow-hidden">
-            <div className="grid grid-cols-4 p-6 border-b border-white/10 font-semibold">
-              <span>Order ID</span>
-              <span>Date</span>
-              <span>Status</span>
-              <span>Total</span>
-            </div>
+          <div
+            className="
+            border
+            border-white/10
+            rounded-3xl
+            overflow-hidden
+            "
+          >
+            {loading ? (
+              <div className="p-8">
+                Loading...
+              </div>
+            ) : orders.length ===
+              0 ? (
+              <div className="p-8">
+                No orders yet
+              </div>
+            ) : (
+              orders
+                .slice(0, 5)
+                .map(
+                  (
+                    order
+                  ) => (
+                    <div
+                      key={
+                        order._id
+                      }
+                      className="
+                      flex
+                      justify-between
+                      items-center
+                      p-6
+                      border-b
+                      border-white/10
+                      "
+                    >
+                      <div>
+                        <p className="font-semibold">
+                          {
+                            order.orderNumber
+                          }
+                        </p>
 
-            <div className="grid grid-cols-4 p-6 border-b border-white/10">
-              <span>#GII001</span>
-              <span>12 Jun 2026</span>
-              <span className="text-green-400">
-                Delivered
-              </span>
-              <span>₦120,000</span>
-            </div>
+                        <p className="text-white/50 text-sm">
+                          {new Date(
+                            order.createdAt
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
 
-            <div className="grid grid-cols-4 p-6">
-              <span>#GII002</span>
-              <span>10 Jun 2026</span>
-              <span className="text-yellow-400">
-                Processing
-              </span>
-              <span>₦80,000</span>
-            </div>
-          </div>
-        </div>
+                      <div>
+                        <span
+                          className="
+                          capitalize
+                          "
+                        >
+                          {
+                            order.status
+                          }
+                        </span>
+                      </div>
 
-        {/* SAVED QUOTATIONS */}
-
-        <div className="mt-20">
-          <h2 className="text-3xl font-bold mb-8">
-            Saved Quotations
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="border border-white/10 rounded-[32px] p-8">
-              <h3 className="text-xl font-bold">
-                Wardrobe Project
-              </h3>
-
-              <p className="text-white/60 mt-3">
-                Generated on 08 Jun 2026
-              </p>
-
-              <button
-                className="
-                mt-6
-                text-[#D4AF37]
-                "
-              >
-                View Quote →
-              </button>
-            </div>
-
-            <div className="border border-white/10 rounded-[32px] p-8">
-              <h3 className="text-xl font-bold">
-                Kitchen Project
-              </h3>
-
-              <p className="text-white/60 mt-3">
-                Generated on 02 Jun 2026
-              </p>
-
-              <button
-                className="
-                mt-6
-                text-[#D4AF37]
-                "
-              >
-                View Quote →
-              </button>
-            </div>
+                      <div>
+                        ₦
+                        {order.totalAmount.toLocaleString()}
+                      </div>
+                    </div>
+                  )
+                )
+            )}
           </div>
         </div>
       </Container>

@@ -37,6 +37,22 @@ export const updateProduct =
     return response.data;
   };
 
+export const updateProductStock =
+  async (
+    id: string,
+    stock: number
+  ) => {
+    const response =
+      await api.patch(
+        `/products/${id}/stock`,
+        {
+          stock,
+        }
+      );
+
+    return response.data;
+  };
+
 export const deleteProduct =
   async (
     id: string

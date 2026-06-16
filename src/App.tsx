@@ -19,6 +19,8 @@ import OrderSuccess from "./pages/OrderSuccess";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyOTP from "./pages/VerifyOTP";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
@@ -71,6 +73,20 @@ function App() {
       <Route
         path="/verify-otp"
         element={<VerifyOTP />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={
+          <ForgotPassword />
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          <ResetPassword />
+        }
       />
 
       {/* PUBLIC WEBSITE */}

@@ -80,12 +80,12 @@ const Login = () => {
 
         navigate("/");
       } catch (
-        error: any
+      error: any
       ) {
         setError(
           error?.response?.data
             ?.message ||
-            "Invalid email or password"
+          "Invalid email or password"
         );
       } finally {
         setLoading(false);
@@ -192,6 +192,19 @@ const Login = () => {
           text-white/50
           "
         >
+
+          <div className="text-center">
+            <Link
+              to="/forgot-password"
+              className="
+    text-[#D4AF37]
+    text-sm
+    "
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
           <span>
             Don't have an account?
           </span>

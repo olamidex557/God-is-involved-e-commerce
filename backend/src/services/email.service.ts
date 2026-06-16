@@ -18,42 +18,144 @@ export const sendOTPEmail =
         to: email,
 
         subject:
-          "Verify Your Account",
+          "Verify Your Email",
 
         html: `
-          <div style="font-family:sans-serif">
-            <h1>God Is Involved</h1>
+          <div
+            style="
+              max-width:600px;
+              margin:auto;
+              font-family:Arial,sans-serif;
+              padding:30px;
+              background:#0f0f0f;
+              color:white;
+              border-radius:20px;
+            "
+          >
+            <h1
+              style="
+                color:#D4AF37;
+              "
+            >
+              God Is Involved
+            </h1>
 
             <p>
-              Your verification code is:
+              Welcome.
+              Please verify your account.
             </p>
 
-            <h2>${otp}</h2>
+            <div
+              style="
+                margin:30px 0;
+                padding:20px;
+                background:#181818;
+                border-radius:12px;
+                text-align:center;
+              "
+            >
+              <h2>${otp}</h2>
+            </div>
 
             <p>
-              Expires in 10 minutes.
+              This code expires
+              in 10 minutes.
             </p>
           </div>
         `,
       });
 
-    if (
-      result.error
-    ) {
-      console.error(
-        "RESEND ERROR:",
-        result.error
-      );
-
+    if (result.error) {
       throw new Error(
         result.error.message
       );
     }
 
-    console.log(
-      "EMAIL SENT:",
-      result.data
-    );
+    return result.data;
+  };
+
+export const sendResetPasswordEmail =
+  async (
+    email: string,
+    token: string
+  ) => {
+    const resetUrl =
+      `${
+        process.env.FRONTEND_URL ||
+        "http://localhost:5173"
+      }/reset-password?token=${token}`;
+
+    const result =
+      await resend.emails.send({
+        from:
+          process.env.EMAIL_FROM ||
+          "onboarding@resend.dev",
+
+        to: email,
+
+        subject:
+          "Reset Your Password",
+
+        html: `
+          <div
+            style="
+              max-width:600px;
+              margin:auto;
+              font-family:Arial,sans-serif;
+              padding:30px;
+              background:#0f0f0f;
+              color:white;
+              border-radius:20px;
+            "
+          >
+            <h1
+              style="
+                color:#D4AF37;
+              "
+            >
+              Password Reset
+            </h1>
+
+            <p>
+              A password reset
+              request was made
+              for your account.
+            </p>
+
+            <a
+              href="${resetUrl}"
+              style="
+                display:inline-block;
+                margin-top:20px;
+                background:#D4AF37;
+                color:black;
+                padding:14px 24px;
+                border-radius:12px;
+                text-decoration:none;
+                font-weight:bold;
+              "
+            >
+              Reset Password
+            </a>
+
+            <p
+              style="
+                margin-top:20px;
+                opacity:.7;
+              "
+            >
+              Link expires in
+              30 minutes.
+            </p>
+          </div>
+        `,
+      });
+
+    if (result.error) {
+      throw new Error(
+        result.error.message
+      );
+    }
 
     return result.data;
   };

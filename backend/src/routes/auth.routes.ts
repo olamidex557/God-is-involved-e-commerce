@@ -6,6 +6,8 @@ import {
   getMe,
   verifyOTP,
   resendOTP,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller";
 
 import {
@@ -32,6 +34,16 @@ router.post(
 router.post(
   "/resend-otp",
   resendOTP
+);
+
+router.post(
+  "/forgot-password",
+  forgotPassword
+);
+
+router.post(
+  "/reset-password",
+  resetPassword
 );
 
 router.get(

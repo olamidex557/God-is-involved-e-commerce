@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 import User from "../models/User";
 
@@ -9,6 +10,7 @@ import { AuthRequest } from "../middleware/auth";
 
 import {
   sendOTPEmail,
+  sendResetPasswordEmail,
 } from "../services/email.service";
 
 const generateOTP = () => {
@@ -245,6 +247,152 @@ export const resendOTP =
         success: false,
         message:
           "Server Error",
+      });
+    }
+  };
+
+
+  export const forgotPassword =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const {
+        email,
+      } = req.body;
+
+      const user =
+        await User.findOne({
+          email,
+        });
+
+      if (!user) {
+        return res.json({
+          success: true,
+          message:
+            "If the account exists, a reset link has been sent.",
+        });
+      }
+
+      const token =
+        crypto
+          .randomBytes(32)
+          .toString("hex");
+
+      user.resetPasswordToken =
+        token;
+
+      user.resetPasswordExpiresAt =
+        new Date(
+          Date.now() +
+            30 *
+              60 *
+              1000
+        );
+
+      await user.save();
+
+      await sendResetPasswordEmail(
+        email,
+        token
+      );
+
+      res.json({
+        success: true,
+        message:
+          "Password reset email sent.",
+      });
+    } catch (error) {
+      console.error(
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Unable to process request",
+      });
+    }
+  };
+
+
+  export const resetPassword =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const {
+        token,
+        password,
+      } = req.body;
+
+      const user =
+        await User.findOne({
+          resetPasswordToken:
+            token,
+        });
+
+      if (!user) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+            message:
+              "Invalid reset token",
+          });
+      }
+
+      if (
+        !user
+          .resetPasswordExpiresAt ||
+        user
+          .resetPasswordExpiresAt <
+          new Date()
+      ) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+            message:
+              "Reset token expired",
+          });
+      }
+
+      const hashedPassword =
+        await bcrypt.hash(
+          password,
+          10
+        );
+
+      user.password =
+        hashedPassword;
+
+      user.resetPasswordToken =
+        null;
+
+      user.resetPasswordExpiresAt =
+        null;
+
+      await user.save();
+
+      res.json({
+        success: true,
+        message:
+          "Password reset successfully",
+      });
+    } catch (error) {
+      console.error(
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Unable to reset password",
       });
     }
   };

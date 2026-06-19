@@ -1,53 +1,44 @@
 import QuoteColumn from "../../../components/admin/quotations/QuoteColumn";
 
-const residential = [
-  {
-    id: "Q-101",
-    client: "Olamide",
-    project:
-      "Luxury Apartment",
-    budget:
-      "₦1,200,000",
-  },
-];
-
-const commercial = [
-  {
-    id: "Q-102",
-    client:
-      "TechHub Ltd",
-    project:
-      "Office Interior",
-    budget:
-      "₦4,500,000",
-  },
-];
-
-const office = [
-  {
-    id: "Q-103",
-    client:
-      "Creative Studio",
-    project:
-      "Workspace Fitout",
-    budget:
-      "₦2,800,000",
-  },
-];
-
-const hospitality = [
-  {
-    id: "Q-104",
-    client:
-      "Sunrise Hotel",
-    project:
-      "Lobby Renovation",
-    budget:
-      "₦8,000,000",
-  },
-];
+import {
+  useQuotes,
+} from "../../../hooks/admin/useQuotes";
 
 const Quotations = () => {
+  const {
+    quotes,
+    loading,
+  } = useQuotes();
+
+  const pending =
+    quotes.filter(
+      (quote) =>
+        quote.status ===
+        "pending"
+    );
+
+  const approved =
+    quotes.filter(
+      (quote) =>
+        quote.status ===
+        "approved"
+    );
+
+  const rejected =
+    quotes.filter(
+      (quote) =>
+        quote.status ===
+        "rejected"
+    );
+
+  if (loading) {
+    return (
+      <div>
+        Loading quotations...
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -61,42 +52,31 @@ const Quotations = () => {
         </h1>
 
         <p className="text-white/50 mt-2">
-          Manage quote requests
-          by project type.
+          Manage quotation
+          requests.
         </p>
       </div>
 
       <div
         className="
         grid
-        xl:grid-cols-4
+        xl:grid-cols-3
         gap-6
         "
       >
         <QuoteColumn
-          title="Residential"
-          quotes={
-            residential
-          }
+          title="Pending"
+          quotes={pending}
         />
 
         <QuoteColumn
-          title="Commercial"
-          quotes={
-            commercial
-          }
+          title="Approved"
+          quotes={approved}
         />
 
         <QuoteColumn
-          title="Office"
-          quotes={office}
-        />
-
-        <QuoteColumn
-          title="Hospitality"
-          quotes={
-            hospitality
-          }
+          title="Rejected"
+          quotes={rejected}
         />
       </div>
     </>

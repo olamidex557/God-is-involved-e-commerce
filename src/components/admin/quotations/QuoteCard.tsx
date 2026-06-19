@@ -1,10 +1,5 @@
 interface Props {
-  quote: {
-    id: string;
-    client: string;
-    project: string;
-    budget: string;
-  };
+  quote: any;
 }
 
 const QuoteCard = ({
@@ -18,12 +13,10 @@ const QuoteCard = ({
       border-white/10
       rounded-2xl
       p-4
-      hover:border-[#D4AF37]
-      transition
       "
     >
-      <p className="text-sm text-white/50">
-        {quote.id}
+      <p className="text-xs text-white/50">
+        {quote._id}
       </p>
 
       <h3
@@ -32,27 +25,37 @@ const QuoteCard = ({
         mt-2
         "
       >
-        {quote.client}
+        {
+          quote.customerName
+        }
       </h3>
 
-      <p
-        className="
-        text-white/60
-        mt-1
-        "
-      >
-        {quote.project}
+      <p className="text-white/60">
+        {
+          quote.projectType
+        }
       </p>
 
       <p
         className="
-        mt-4
         text-[#D4AF37]
-        font-medium
+        mt-4
         "
       >
-        {quote.budget}
+        ₦
+        {quote.estimatedAmount?.toLocaleString()}
       </p>
+
+      <div
+        className="
+        mt-4
+        text-sm
+        "
+      >
+        {
+          quote.status
+        }
+      </div>
     </div>
   );
 };

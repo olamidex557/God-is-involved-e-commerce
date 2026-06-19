@@ -12,7 +12,9 @@ export const useQuotes =
     const [
       quotes,
       setQuotes,
-    ] = useState([]);
+    ] = useState<any[]>(
+      []
+    );
 
     const [
       loading,
@@ -26,10 +28,14 @@ export const useQuotes =
             await getQuotes();
 
           setQuotes(
-            response.quotes || []
+            response.quotes
           );
-        } catch (error) {
-          console.error(error);
+        } catch (
+          error
+        ) {
+          console.error(
+            error
+          );
         } finally {
           setLoading(false);
         }

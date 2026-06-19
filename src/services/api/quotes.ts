@@ -1,22 +1,5 @@
 import { api } from "./client";
 
-import type {
-  CreateQuotePayload,
-} from "../../types/quotation";
-
-export const createQuote =
-  async (
-    payload: CreateQuotePayload
-  ) => {
-    const response =
-      await api.post(
-        "/quotes",
-        payload
-      );
-
-    return response.data;
-  };
-
 export const getQuotes =
   async () => {
     const response =
@@ -27,17 +10,14 @@ export const getQuotes =
     return response.data;
   };
 
-export const updateQuoteStatus =
+export const createQuote =
   async (
-    id: string,
-    status: string
+    quote: any
   ) => {
     const response =
-      await api.patch(
-        `/quotes/${id}`,
-        {
-          status,
-        }
+      await api.post(
+        "/quotes",
+        quote
       );
 
     return response.data;

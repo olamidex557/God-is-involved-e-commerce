@@ -2,23 +2,17 @@ import mongoose from "mongoose";
 
 const quoteSchema = new mongoose.Schema(
   {
-    quoteNumber: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
     customerName: {
       type: String,
       required: true,
     },
 
-    customerEmail: {
+    email: {
       type: String,
       required: true,
     },
 
-    customerPhone: {
+    phone: {
       type: String,
       required: true,
     },
@@ -28,34 +22,17 @@ const quoteSchema = new mongoose.Schema(
       required: true,
     },
 
-    width: {
-      type: Number,
-      required: true,
-    },
+    width: Number,
+    height: Number,
+    depth: Number,
 
-    height: {
+    estimatedAmount: {
       type: Number,
-      required: true,
-    },
-
-    depth: {
-      type: Number,
-      required: true,
-    },
-
-    estimatedCost: {
-      type: Number,
-      required: true,
+      default: 0,
     },
 
     status: {
       type: String,
-      enum: [
-        "pending",
-        "reviewing",
-        "approved",
-        "rejected",
-      ],
       default: "pending",
     },
   },

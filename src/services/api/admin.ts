@@ -13,6 +13,12 @@ export interface LowStockProduct {
   stock: number;
 }
 
+export interface ActivityItem {
+  type: string;
+  title: string;
+  date: string;
+}
+
 export interface DashboardStats {
   totalProducts: number;
   totalOrders: number;
@@ -41,6 +47,18 @@ export const getDashboardStats =
     const response =
       await api.get(
         "/admin/stats"
+      );
+
+    return response.data;
+  };
+
+export const getActivity =
+  async (): Promise<{
+    activities: ActivityItem[];
+  }> => {
+    const response =
+      await api.get(
+        "/activity"
       );
 
     return response.data;

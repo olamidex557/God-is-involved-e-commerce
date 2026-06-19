@@ -7,6 +7,7 @@ import uploadRoutes from "./routes/upload.routes";
 import adminRoutes from "./routes/admin.routes";
 import orderRoutes from "./routes/order.routes";
 import userRoutes from "./routes/user.routes";
+import activityRoutes from "./routes/activity.routes";
 
 const app = express();
 
@@ -23,6 +24,11 @@ app.get(
         "God Is Involved API Running",
     });
   }
+);
+
+app.use(
+  "/api/activity",
+  activityRoutes
 );
 
 app.use(

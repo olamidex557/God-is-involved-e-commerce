@@ -2,7 +2,6 @@ interface User {
   _id: string;
   firstName: string;
   lastName: string;
-  email: string;
   createdAt: string;
 }
 
@@ -16,10 +15,7 @@ const UserActivity = ({
   const recentUsers =
     [...users]
       .sort(
-        (
-          a,
-          b
-        ) =>
+        (a, b) =>
           new Date(
             b.createdAt
           ).getTime() -
@@ -46,17 +42,17 @@ const UserActivity = ({
         mb-6
         "
       >
-        Recent Customer Activity
+        Recent Registrations
       </h2>
 
-      {recentUsers.length ===
-      0 ? (
-        <p className="text-white/50">
-          No customer activity.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {recentUsers.map(
+      <div className="space-y-4">
+        {recentUsers.length ===
+        0 ? (
+          <p className="text-white/50">
+            No activity found.
+          </p>
+        ) : (
+          recentUsers.map(
             (user) => (
               <div
                 key={
@@ -64,59 +60,36 @@ const UserActivity = ({
                 }
                 className="
                 flex
-                items-start
-                gap-4
-                border-b
-                border-white/10
-                pb-4
+                items-center
+                gap-3
                 "
               >
                 <div
                   className="
-                  w-10
-                  h-10
+                  w-2
+                  h-2
                   rounded-full
                   bg-[#D4AF37]
-                  text-black
-                  font-bold
-                  flex
-                  items-center
-                  justify-center
                   "
-                >
-                  {user.firstName?.[0]}
-                  {user.lastName?.[0]}
-                </div>
+                />
 
                 <div>
-                  <p className="font-medium">
+                  <p>
                     {
                       user.firstName
                     }{" "}
                     {
                       user.lastName
-                    }
-                  </p>
-
-                  <p
-                    className="
-                    text-sm
-                    text-white/50
-                    "
-                  >
-                    {
-                      user.email
-                    }
+                    }{" "}
+                    registered
                   </p>
 
                   <p
                     className="
                     text-xs
-                    text-[#D4AF37]
-                    mt-1
+                    text-white/50
                     "
                   >
-                    Registered{" "}
                     {new Date(
                       user.createdAt
                     ).toLocaleDateString()}
@@ -124,9 +97,9 @@ const UserActivity = ({
                 </div>
               </div>
             )
-          )}
-        </div>
-      )}
+          )
+        )}
+      </div>
     </div>
   );
 };

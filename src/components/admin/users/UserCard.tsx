@@ -1,16 +1,22 @@
 interface Props {
   user: {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    orders: number;
-    quotes: number;
-    spending: string;
+    totalOrders: number;
+    totalSpent: number;
+    role: string;
   };
 }
 
 const UserCard = ({
   user,
 }: Props) => {
+  const initials =
+    `${user.firstName[0] ?? ""}${
+      user.lastName[0] ?? ""
+    }`;
+
   return (
     <div
       className="
@@ -37,10 +43,7 @@ const UserCard = ({
         text-lg
         "
       >
-        {user.name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")}
+        {initials}
       </div>
 
       <h3
@@ -50,25 +53,37 @@ const UserCard = ({
         mt-4
         "
       >
-        {user.name}
+        {user.firstName}{" "}
+        {user.lastName}
       </h3>
 
       <p className="text-white/50">
         {user.email}
       </p>
 
+      <p
+        className="
+        mt-2
+        text-xs
+        uppercase
+        text-[#D4AF37]
+        "
+      >
+        {user.role}
+      </p>
+
       <div
         className="
         mt-6
         grid
-        grid-cols-3
-        gap-3
+        grid-cols-2
+        gap-4
         text-center
         "
       >
         <div>
           <p className="font-bold">
-            {user.orders}
+            {user.totalOrders}
           </p>
 
           <p className="text-xs text-white/50">
@@ -78,17 +93,8 @@ const UserCard = ({
 
         <div>
           <p className="font-bold">
-            {user.quotes}
-          </p>
-
-          <p className="text-xs text-white/50">
-            Quotes
-          </p>
-        </div>
-
-        <div>
-          <p className="font-bold">
-            {user.spending}
+            ₦
+            {user.totalSpent.toLocaleString()}
           </p>
 
           <p className="text-xs text-white/50">

@@ -1,25 +1,10 @@
-const transactions = [
-  {
-    id: "TXN-1001",
-    customer: "Olamide",
-    amount: "₦250,000",
-    status: "Success",
-  },
-  {
-    id: "TXN-1002",
-    customer: "James",
-    amount: "₦120,000",
-    status: "Pending",
-  },
-  {
-    id: "TXN-1003",
-    customer: "Sarah",
-    amount: "₦450,000",
-    status: "Success",
-  },
-];
+interface Props {
+  transactions: any[];
+}
 
-const TransactionList = () => {
+const TransactionList = ({
+  transactions,
+}: Props) => {
   return (
     <div
       className="
@@ -41,42 +26,66 @@ const TransactionList = () => {
       </h2>
 
       <div className="space-y-4">
-        {transactions.map(
-          (item) => (
-            <div
-              key={item.id}
-              className="
-              flex
-              justify-between
-              items-center
-              "
-            >
-              <div>
-                <p>{item.customer}</p>
+        {transactions.length ===
+        0 ? (
+          <p className="text-white/50">
+            No transactions.
+          </p>
+        ) : (
+          transactions.map(
+            (item) => (
+              <div
+                key={
+                  item._id
+                }
+                className="
+                flex
+                justify-between
+                items-center
+                "
+              >
+                <div>
+                  <p>
+                    {
+                      item.orderNumber
+                    }
+                  </p>
 
-                <p
+                  <p
+                    className="
+                    text-sm
+                    text-white/50
+                    "
+                  >
+                    {
+                      item.status
+                    }
+                  </p>
+                </div>
+
+                <div
                   className="
-                  text-sm
-                  text-white/50
+                  text-right
                   "
                 >
-                  {item.id}
-                </p>
-              </div>
+                  <p>
+                    ₦
+                    {item.totalAmount.toLocaleString()}
+                  </p>
 
-              <div className="text-right">
-                <p>{item.amount}</p>
-
-                <p
-                  className="
-                  text-sm
-                  text-green-500
-                  "
-                >
-                  {item.status}
-                </p>
+                  <p
+                    className="
+                    text-xs
+                    text-white/50
+                    "
+                  >
+                    {
+                      item.paymentStatus
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
+            )
           )
         )}
       </div>

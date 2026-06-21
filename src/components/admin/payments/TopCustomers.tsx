@@ -1,19 +1,10 @@
-const customers = [
-  {
-    name: "Olamide",
-    spending: "₦1.2M",
-  },
-  {
-    name: "Sarah",
-    spending: "₦980K",
-  },
-  {
-    name: "TechHub Ltd",
-    spending: "₦760K",
-  },
-];
+interface Props {
+  customers: any[];
+}
 
-const TopCustomers = () => {
+const TopCustomers = ({
+  customers,
+}: Props) => {
   return (
     <div
       className="
@@ -35,32 +26,53 @@ const TopCustomers = () => {
       </h2>
 
       <div className="space-y-4">
-        {customers.map(
-          (
-            customer,
-            index
-          ) => (
-            <div
-              key={index}
-              className="
-              flex
-              justify-between
-              "
-            >
-              <p>
-                {customer.name}
-              </p>
-
-              <p
+        {customers.length === 0 ? (
+          <p className="text-white/50">
+            No customer data.
+          </p>
+        ) : (
+          customers.map(
+            (customer) => (
+              <div
+                key={
+                  customer.email
+                }
                 className="
-                text-[#D4AF37]
+                flex
+                justify-between
+                items-center
                 "
               >
-                {
-                  customer.spending
-                }
-              </p>
-            </div>
+                <div>
+                  <p>
+                    {
+                      customer.name
+                    }
+                  </p>
+
+                  <p
+                    className="
+                    text-xs
+                    text-white/50
+                    "
+                  >
+                    {
+                      customer.orders
+                    }{" "}
+                    orders
+                  </p>
+                </div>
+
+                <p
+                  className="
+                  text-[#D4AF37]
+                  "
+                >
+                  ₦
+                  {customer.totalSpent.toLocaleString()}
+                </p>
+              </div>
+            )
           )
         )}
       </div>

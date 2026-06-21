@@ -2,7 +2,24 @@ import RevenueCard from "../../../components/admin/payments/RevenueCard";
 import TransactionList from "../../../components/admin/payments/TransactionList";
 import TopCustomers from "../../../components/admin/payments/TopCustomers";
 
+import {
+  usePayments,
+} from "../../../hooks/admin/usePayments";
+
 const Payments = () => {
+  const {
+    stats,
+    loading,
+  } = usePayments();
+
+  if (loading) {
+    return (
+      <div>
+        Loading payments...
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -24,32 +41,28 @@ const Payments = () => {
       <div
         className="
         grid
-        md:grid-cols-4
+        md:grid-cols-3
         gap-6
         "
       >
         <RevenueCard
           title="Revenue"
-          value="₦24.8M"
-          growth="+12%"
+          value={`₦${stats?.totalRevenue?.toLocaleString() || 0}`}
+          subtitle="Total revenue"
         />
 
         <RevenueCard
-          title="Pending"
-          value="₦2.1M"
-          growth="+4%"
+          title="Transactions"
+          value={`${stats?.totalTransactions || 0}`}
+          subtitle="Completed orders"
         />
 
         <RevenueCard
-          title="Successful"
-          value="₦22.4M"
-          growth="+18%"
-        />
-
-        <RevenueCard
-          title="Refunds"
-          value="₦320K"
-          growth="-2%"
+          title="Average Order"
+          value={`₦${Math.round(
+            stats?.averageOrderValue || 0
+          ).toLocaleString()}`}
+          subtitle="Average spend"
         />
       </div>
 
@@ -61,9 +74,19 @@ const Payments = () => {
         gap-6
         "
       >
-        <TransactionList />
+        <TransactionList
+          transactions={
+            stats?.recentTransactions ||
+            []
+          }
+        />
 
-        <TopCustomers />
+        <TopCustomers
+          customers={
+            stats?.topCustomers ||
+            []
+          }
+        />
       </div>
     </>
   );

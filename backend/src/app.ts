@@ -9,6 +9,8 @@ import orderRoutes from "./routes/order.routes";
 import userRoutes from "./routes/user.routes";
 import activityRoutes from "./routes/activity.routes";
 import quoteRoutes from "./routes/quote.routes";
+import paymentRoutes from "./routes/payment.routes";
+import telegramRoutes from "./routes/telegram.routes";
 
 const app = express();
 
@@ -25,6 +27,16 @@ app.get(
         "God Is Involved API Running",
     });
   }
+);
+
+app.use(
+  "/api/telegram",
+  telegramRoutes
+);
+
+app.use(
+  "/api/payments",
+  paymentRoutes
 );
 
 app.use(

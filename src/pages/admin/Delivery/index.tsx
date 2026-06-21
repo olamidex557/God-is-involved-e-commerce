@@ -1,47 +1,55 @@
 import DeliveryColumn from "../../../components/admin/delivery/DeliveryColumn";
 
-const pending = [
-  {
-    orderId: "#201",
-    customer: "Olamide",
-    location: "Lagos",
-  },
-];
-
-const transit = [
-  {
-    orderId: "#202",
-    customer: "Sarah",
-    location: "Abuja",
-  },
-];
-
-const delivered = [
-  {
-    orderId: "#203",
-    customer: "James",
-    location: "Ibadan",
-  },
-];
-
-const failed = [
-  {
-    orderId: "#204",
-    customer: "David",
-    location: "Port Harcourt",
-  },
-];
+import {
+  useDelivery,
+} from "../../../hooks/admin/useDelivery";
 
 const Delivery = () => {
+  const {
+    orders,
+    loading,
+  } = useDelivery();
+
+  if (loading) {
+    return (
+      <div>
+        Loading deliveries...
+      </div>
+    );
+  }
+
+  const pending =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "pending"
+    );
+
+  const processing =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "processing"
+    );
+
+  const shipped =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "shipped"
+    );
+
+  const delivered =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "delivered"
+    );
+
   return (
     <>
       <div className="mb-8">
-        <h1
-          className="
-          text-4xl
-          font-bold
-          "
-        >
+        <h1 className="text-4xl font-bold">
           Delivery
         </h1>
 
@@ -59,23 +67,31 @@ const Delivery = () => {
         "
       >
         <DeliveryColumn
-          title="Pending Pickup"
-          deliveries={pending}
+          title="Pending"
+          deliveries={
+            pending
+          }
         />
 
         <DeliveryColumn
-          title="In Transit"
-          deliveries={transit}
+          title="Processing"
+          deliveries={
+            processing
+          }
+        />
+
+        <DeliveryColumn
+          title="Shipped"
+          deliveries={
+            shipped
+          }
         />
 
         <DeliveryColumn
           title="Delivered"
-          deliveries={delivered}
-        />
-
-        <DeliveryColumn
-          title="Failed"
-          deliveries={failed}
+          deliveries={
+            delivered
+          }
         />
       </div>
     </>

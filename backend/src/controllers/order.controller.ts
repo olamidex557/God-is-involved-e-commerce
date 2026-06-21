@@ -4,10 +4,21 @@ import {
 
 import Order from "../models/Order";
 import Product from "../models/Product";
+import User from "../models/User";
 
 import {
   AuthRequest,
 } from "../middleware/auth";
+
+import {
+  sendTelegramMessage,
+} from "../services/telegram.service";
+
+import {
+  formatNewOrderAlert,
+  formatLowStockAlert,
+  formatOutOfStockAlert,
+} from "../utils/operationsBot";
 
 const generateOrderNumber =
   () => {
@@ -110,7 +121,63 @@ export const createOrder =
             product.stock > 0;
 
           await product.save();
+
+          try {
+            if (
+              product.stock === 0
+            ) {
+              await sendTelegramMessage(
+                formatOutOfStockAlert(
+                  product.name
+                )
+              );
+            } else if (
+              product.stock <=
+              product.lowStockThreshold
+            ) {
+              await sendTelegramMessage(
+                formatLowStockAlert(
+                  product.name,
+                  product.stock
+                )
+              );
+            }
+          } catch (
+            error
+          ) {
+            console.error(
+              "Stock alert failed:",
+              error
+            );
+          }
         }
+      }
+
+      try {
+        const customer =
+          await User.findById(
+            req.userId
+          );
+
+        const customerName =
+          customer
+            ? `${customer.firstName} ${customer.lastName}`
+            : "Unknown Customer";
+
+        await sendTelegramMessage(
+          formatNewOrderAlert(
+            order.orderNumber,
+            customerName,
+            order.totalAmount
+          )
+        );
+      } catch (
+        error
+      ) {
+        console.error(
+          "Telegram alert failed:",
+          error
+        );
       }
 
       res.status(201).json({

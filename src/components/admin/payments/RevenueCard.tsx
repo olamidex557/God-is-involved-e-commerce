@@ -1,13 +1,13 @@
 interface Props {
   title: string;
   value: string;
-  growth: string;
+  subtitle?: string;
 }
 
 const RevenueCard = ({
   title,
   value,
-  growth,
+  subtitle,
 }: Props) => {
   return (
     <div
@@ -33,14 +33,17 @@ const RevenueCard = ({
         {value}
       </h3>
 
-      <p
-        className="
-        text-green-500
-        mt-2
-        "
-      >
-        {growth}
-      </p>
+      {subtitle && (
+        <p
+          className="
+          text-white/40
+          mt-2
+          text-sm
+          "
+        >
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,9 +1,5 @@
 interface Props {
-  delivery: {
-    orderId: string;
-    customer: string;
-    location: string;
-  };
+  delivery: any;
 }
 
 const DeliveryCard = ({
@@ -17,35 +13,28 @@ const DeliveryCard = ({
       border-white/10
       rounded-2xl
       p-4
-      hover:border-[#D4AF37]
-      transition
       "
     >
-      <p
-        className="
-        text-sm
-        text-white/50
-        "
-      >
-        {delivery.orderId}
+      <p className="text-sm text-white/50">
+        {
+          delivery.orderNumber
+        }
       </p>
 
-      <h3
-        className="
-        mt-2
-        font-semibold
-        "
-      >
-        {delivery.customer}
+      <h3 className="mt-2 font-semibold">
+        {
+          delivery
+            ?.shippingAddress
+            ?.fullName
+        }
       </h3>
 
-      <p
-        className="
-        mt-3
-        text-white/60
-        "
-      >
-        {delivery.location}
+      <p className="mt-3 text-white/60">
+        {
+          delivery
+            ?.shippingAddress
+            ?.city
+        }
       </p>
     </div>
   );

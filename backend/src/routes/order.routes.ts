@@ -7,6 +7,7 @@ import {
   getMyOrders,
   getOrderById,
   getAllOrders,
+  trackOrder,
   updateOrderStatus,
 } from "../controllers/order.controller";
 
@@ -17,6 +18,13 @@ import {
 import {
   requireAdmin,
 } from "../middleware/admin";
+import {
+  validateBody,
+} from "../middleware/validate";
+import {
+  createOrderSchema,
+  updateOrderStatusSchema,
+} from "../validations/order.validation";
 
 const router =
   Router();
@@ -30,6 +38,9 @@ const router =
 router.post(
   "/",
   protect,
+  validateBody(
+    createOrderSchema
+  ),
   createOrder
 );
 
@@ -37,6 +48,11 @@ router.get(
   "/my-orders",
   protect,
   getMyOrders
+);
+
+router.get(
+  "/track/:orderNumber",
+  trackOrder
 );
 
 router.get(
@@ -62,6 +78,9 @@ router.patch(
   "/:id/status",
   protect,
   requireAdmin,
+  validateBody(
+    updateOrderStatusSchema
+  ),
   updateOrderStatus
 );
 

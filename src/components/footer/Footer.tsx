@@ -1,57 +1,47 @@
-import {
-  lazy,
-  Suspense,
-} from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo/logo.png";
 import {
   businessLocation,
 } from "../../config/location";
 
-const GoogleLocationMap =
-  lazy(
-    () =>
-      import(
-        "../maps/GoogleLocationMap"
-      )
-  );
-
 const Footer = () => {
   return (
     <footer
       className="
-      mt-32
+      mt-20
       border-t
       border-white/10
+      bg-black/40
       "
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* MAIN FOOTER */}
 
-        <div className="py-16 md:py-20">
+        <div className="py-10 md:py-12">
           <div
             className="
             grid
-            grid-cols-2
-            lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]
-            gap-10
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.9fr_1fr]
+            gap-8
             "
           >
             {/* BRAND */}
 
-            <div className="col-span-2 lg:col-span-1">
+            <div className="sm:col-span-2 lg:col-span-1">
               <img
                 src={logo}
                 alt="God Is Involved"
-                className="h-16 object-contain"
+                className="h-12 object-contain"
               />
 
               <h2
                 className="
                 text-2xl
-                md:text-4xl
+                md:text-3xl
                 font-bold
-                mt-8
+                mt-5
                 leading-tight
                 "
               >
@@ -65,8 +55,10 @@ const Footer = () => {
               <p
                 className="
                 text-white/60
-                mt-6
+                mt-4
                 max-w-md
+                text-sm
+                leading-6
                 "
               >
                 MDF, HDF, plywood and furniture
@@ -82,14 +74,14 @@ const Footer = () => {
               <h3
                 className="
                 font-bold
-                text-lg
-                mb-5
+                text-base
+                mb-4
                 "
               >
                 Quick Links
               </h3>
 
-              <div className="flex flex-col gap-3 text-white/60">
+              <div className="flex flex-col gap-2 text-sm text-white/60">
                 <Link to="/">Home</Link>
 
                 <Link to="/materials">
@@ -103,6 +95,10 @@ const Footer = () => {
                 <Link to="/contact">
                   Contact
                 </Link>
+
+                <Link to="/track-order">
+                  Track Order
+                </Link>
               </div>
             </div>
 
@@ -112,14 +108,14 @@ const Footer = () => {
               <h3
                 className="
                 font-bold
-                text-lg
-                mb-5
+                text-base
+                mb-4
                 "
               >
                 Collections
               </h3>
 
-              <div className="flex flex-col gap-3 text-white/60">
+              <div className="flex flex-col gap-2 text-sm text-white/60">
                 <Link to="/materials">
                   MDF Boards
                 </Link>
@@ -144,14 +140,14 @@ const Footer = () => {
               <h3
                 className="
                 font-bold
-                text-lg
-                mb-5
+                text-base
+                mb-4
                 "
               >
                 Legal
               </h3>
 
-              <div className="flex flex-col gap-3 text-white/60">
+              <div className="flex flex-col gap-2 text-sm text-white/60">
                 <Link to="/privacy-policy">
                   Privacy Policy
                 </Link>
@@ -176,14 +172,14 @@ const Footer = () => {
               <h3
                 className="
                 font-bold
-                text-lg
-                mb-5
+                text-base
+                mb-4
                 "
               >
                 Contact
               </h3>
 
-              <div className="flex flex-col gap-3 text-white/60">
+              <div className="flex flex-col gap-2 text-sm text-white/60">
                 <p>
                   {businessLocation.address}
                 </p>
@@ -210,18 +206,6 @@ const Footer = () => {
                 </a>
               </div>
 
-              <div className="mt-6">
-                <Suspense
-                  fallback={
-                    <div className="h-[220px] rounded-[28px] bg-zinc-900" />
-                  }
-                >
-                  <GoogleLocationMap
-                    compact
-                    className="min-h-[220px]"
-                  />
-                </Suspense>
-              </div>
             </div>
           </div>
         </div>
@@ -232,7 +216,7 @@ const Footer = () => {
           className="
           border-t
           border-white/10
-          py-8
+          py-5
           "
         >
           <div
@@ -240,7 +224,7 @@ const Footer = () => {
             flex
             flex-col
             md:flex-row
-            gap-6
+            gap-4
             justify-between
             items-center
             text-center

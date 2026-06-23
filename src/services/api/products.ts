@@ -1,17 +1,39 @@
 import { api } from "./client";
+import type {
+  Product,
+} from "../../types/product";
 
 export const getProducts =
-  async () => {
+  async (
+    params?: {
+      search?: string;
+      category?: string;
+      minPrice?: string;
+      maxPrice?: string;
+      sort?: string;
+    }
+  ): Promise<{
+    success: boolean;
+    products: Product[];
+  }> => {
     const response =
       await api.get(
-        "/products"
+        "/products",
+        {
+          params,
+        }
       );
 
     return response.data;
   };
 
 export const getProduct =
-  async (id: string) => {
+  async (
+    id: string
+  ): Promise<{
+    success: boolean;
+    product: Product;
+  }> => {
     const response =
       await api.get(
         `/products/${id}`

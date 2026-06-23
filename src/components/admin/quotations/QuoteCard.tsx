@@ -1,5 +1,9 @@
+import type {
+  Quote,
+} from "../../../types/quotation";
+
 interface Props {
-  quote: any;
+  quote: Quote;
 }
 
 const QuoteCard = ({
@@ -43,7 +47,7 @@ const QuoteCard = ({
         "
       >
         ₦
-        {quote.estimatedAmount?.toLocaleString()}
+        {quote.estimatedCost.toLocaleString()}
       </p>
 
       <div

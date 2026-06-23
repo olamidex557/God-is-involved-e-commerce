@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react";
+import axios from "axios";
 
 import {
   useNavigate,
@@ -69,12 +70,16 @@ const VerifyOTP = () => {
           );
         }, 1500);
       } catch (
-        error: any
+        error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-            "Verification failed"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Verification failed"
+            : "Verification failed"
         );
       } finally {
         setLoading(false);
@@ -92,12 +97,16 @@ const VerifyOTP = () => {
           "OTP resent successfully"
         );
       } catch (
-        error: any
+        error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-            "Unable to resend OTP"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Unable to resend OTP"
+            : "Unable to resend OTP"
         );
       }
     };

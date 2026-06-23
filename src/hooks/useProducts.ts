@@ -10,8 +10,26 @@ import type {
   Product,
 } from "../types/product";
 
+interface ProductFilters {
+  search?: string;
+  category?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  sort?: string;
+}
+
 export const useProducts =
-  () => {
+  (
+    filters: ProductFilters = {}
+  ) => {
+    const {
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      sort,
+    } = filters;
+
     const [
       products,
       setProducts,
@@ -27,7 +45,15 @@ export const useProducts =
         async () => {
           try {
             const data =
-              await getProducts();
+              await getProducts(
+                {
+                  search,
+                  category,
+                  minPrice,
+                  maxPrice,
+                  sort,
+                }
+              );
 
             setProducts(
               data.products
@@ -40,7 +66,13 @@ export const useProducts =
         };
 
       fetchProducts();
-    }, []);
+    }, [
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      sort,
+    ]);
 
     return {
       products,

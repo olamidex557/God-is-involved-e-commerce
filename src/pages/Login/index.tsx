@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react";
+import axios from "axios";
 
 import {
   Link,
@@ -80,12 +81,16 @@ const Login = () => {
 
         navigate("/");
       } catch (
-      error: any
+      error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-          "Invalid email or password"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Invalid email or password"
+            : "Invalid email or password"
         );
       } finally {
         setLoading(false);

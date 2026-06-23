@@ -3,6 +3,7 @@ import Order, {
   PaymentStatus,
 } from "../models/Order";
 import Product from "../models/Product";
+import User from "../models/User";
 import {
   detectIntent,
 } from "../utils/telegramIntent";
@@ -647,6 +648,17 @@ const deliveredOrders =
     return `📦 Delivered Orders\n\n${delivered}`;
   };
 
+const cancelledOrders =
+  async () => {
+    const cancelled =
+      await Order.countDocuments({
+        status:
+          "cancelled",
+      });
+
+    return `📦 Cancelled Orders\n\n${cancelled}`;
+  };
+
 const orderCount =
   async () => {
     const orders =
@@ -721,6 +733,184 @@ ${products
       index
     ) =>
       `${index + 1}. ${product._id} - ${product.unitsSold} sold (${formatCurrency(product.revenue)})`
+  )
+  .join("\n")}
+`;
+  };
+
+const topProductsThisMonth =
+  async () => {
+    const start =
+      new Date();
+
+    start.setDate(
+      1
+    );
+    start.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    const products =
+      await Order.aggregate<TopProductResult>([
+        {
+          $match: {
+            status: {
+              $ne:
+                "cancelled",
+            },
+            createdAt: {
+              $gte:
+                start,
+            },
+          },
+        },
+        {
+          $unwind:
+            "$items",
+        },
+        {
+          $group: {
+            _id:
+              "$items.name",
+            unitsSold: {
+              $sum:
+                "$items.quantity",
+            },
+            revenue: {
+              $sum: {
+                $multiply: [
+                  "$items.price",
+                  "$items.quantity",
+                ],
+              },
+            },
+          },
+        },
+        {
+          $sort: {
+            unitsSold:
+              -1,
+          },
+        },
+        {
+          $limit:
+            5,
+        },
+      ]);
+
+    if (products.length === 0) {
+      return "No product sales this month yet.";
+    }
+
+    return `
+🏆 BEST SELLERS THIS MONTH
+
+${products
+  .map(
+    (
+      product,
+      index
+    ) =>
+      `${index + 1}. ${product._id} - ${product.unitsSold} sold (${formatCurrency(product.revenue)})`
+  )
+  .join("\n")}
+`;
+  };
+
+interface TopCustomerResult {
+  _id: string;
+  orders: number;
+  revenue: number;
+}
+
+const topCustomers =
+  async () => {
+    const customers =
+      await Order.aggregate<TopCustomerResult>([
+        {
+          $match: {
+            paymentStatus:
+              "paid",
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $toString:
+                "$user",
+            },
+            orders: {
+              $sum:
+                1,
+            },
+            revenue: {
+              $sum:
+                "$totalAmount",
+            },
+          },
+        },
+        {
+          $sort: {
+            revenue:
+              -1,
+          },
+        },
+        {
+          $limit:
+            5,
+        },
+      ]);
+
+    if (customers.length === 0) {
+      return "No paid customer data yet.";
+    }
+
+    const userIds =
+      customers.map(
+        (
+          customer
+        ) =>
+          customer._id
+      );
+
+    const users =
+      await User.find({
+        _id: {
+          $in:
+            userIds,
+        },
+      });
+
+    return `
+👥 TOP CUSTOMERS
+
+${customers
+  .map(
+    (
+      customer,
+      index
+    ) => {
+      const user =
+        users.find(
+          (
+            item
+          ) =>
+            String(
+              item._id
+            ) ===
+            customer._id
+        );
+
+      const name =
+        user
+          ? `${user.firstName} ${user.lastName}`
+          : "Unknown Customer";
+
+      return `${index + 1}. ${name} - ${customer.orders} orders (${formatCurrency(customer.revenue)})`;
+    }
   )
   .join("\n")}
 `;
@@ -895,6 +1085,7 @@ Available Commands
 /pending
 /orders
 /delivered
+/cancelled
 /stock
 /revenue
 /summary
@@ -902,6 +1093,8 @@ Available Commands
 /low-stock
 /out-of-stock
 /top-products
+/best-sellers-month
+/top-customers
 /daily-report
 /payment-stats
 /failed-payments
@@ -936,10 +1129,13 @@ You can also ask:
 
 Any pending orders?
 What products need restocking?
+What sold best this month?
 Show today’s revenue
 Give me inventory summary
 How many delivered orders do we have?
+Show cancelled orders.
 Which products are out of stock?
+Who are our top customers?
 How much revenue did we make today?
 
 Dangerous actions require confirmation.
@@ -951,6 +1147,17 @@ const routeNaturalLanguage =
   ) => {
     const message =
       text.toLowerCase();
+
+    if (
+      message.includes(
+        "cancelled"
+      ) &&
+      message.includes(
+        "order"
+      )
+    ) {
+      return "/cancelled";
+    }
 
     if (
       message.includes(
@@ -969,6 +1176,36 @@ const routeNaturalLanguage =
       )
     ) {
       return "/out-of-stock";
+    }
+
+    if (
+      (
+        message.includes(
+          "sold best"
+        ) ||
+        message.includes(
+          "best sellers"
+        ) ||
+        message.includes(
+          "best-selling"
+        )
+      ) &&
+      message.includes(
+        "month"
+      )
+    ) {
+      return "/best-sellers-month";
+    }
+
+    if (
+      message.includes(
+        "top customers"
+      ) ||
+      message.includes(
+        "best customers"
+      )
+    ) {
+      return "/top-customers";
     }
 
     if (
@@ -1240,6 +1477,9 @@ export const handleTelegramOperationsMessage =
       case "/delivered":
         return deliveredOrders();
 
+      case "/cancelled":
+        return cancelledOrders();
+
       case "/stock":
         return stock();
 
@@ -1260,6 +1500,12 @@ export const handleTelegramOperationsMessage =
 
       case "/top-products":
         return topProducts();
+
+      case "/best-sellers-month":
+        return topProductsThisMonth();
+
+      case "/top-customers":
+        return topCustomers();
 
       case "/daily-report":
         return dailyReport();

@@ -1,8 +1,11 @@
 import QuoteCard from "./QuoteCard";
+import type {
+  Quote,
+} from "../../../types/quotation";
 
 interface Props {
   title: string;
-  quotes: any[];
+  quotes: Quote[];
 }
 
 const QuoteColumn = ({
@@ -40,7 +43,7 @@ const QuoteColumn = ({
         {quotes.map(
           (quote) => (
             <QuoteCard
-              key={quote.id}
+              key={quote._id}
               quote={quote}
             />
           )

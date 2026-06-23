@@ -1,12 +1,9 @@
+import type {
+  User,
+} from "../../../types/user";
+
 interface Props {
-  user: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    totalOrders: number;
-    totalSpent: number;
-    role: string;
-  };
+  user: User;
 }
 
 const UserCard = ({
@@ -83,7 +80,8 @@ const UserCard = ({
       >
         <div>
           <p className="font-bold">
-            {user.totalOrders}
+            {user.totalOrders ||
+              0}
           </p>
 
           <p className="text-xs text-white/50">
@@ -94,7 +92,8 @@ const UserCard = ({
         <div>
           <p className="font-bold">
             ₦
-            {user.totalSpent.toLocaleString()}
+            {(user.totalSpent ||
+              0).toLocaleString()}
           </p>
 
           <p className="text-xs text-white/50">

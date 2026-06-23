@@ -19,6 +19,88 @@ const numberFormatter =
     "en-NG"
   );
 
+interface MiniBarChartProps {
+  title: string;
+  data: {
+    label: string;
+    value: number;
+  }[];
+  formatValue?: (
+    value: number
+  ) => string;
+}
+
+const MiniBarChart = ({
+  title,
+  data,
+  formatValue = (
+    value
+  ) =>
+    numberFormatter.format(
+      value
+    ),
+}: MiniBarChartProps) => {
+  const max =
+    Math.max(
+      ...data.map(
+        (
+          point
+        ) =>
+          point.value
+      ),
+      1
+    );
+
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+      <h2 className="text-xl font-semibold mb-6">
+        {title}
+      </h2>
+
+      <div className="flex items-end gap-3 h-44">
+        {data.map(
+          (
+            point
+          ) => (
+            <div
+              key={
+                point.label
+              }
+              className="flex-1 flex flex-col justify-end gap-3"
+            >
+              <div
+                className="
+                rounded-t-xl
+                bg-[#D4AF37]
+                min-h-2
+                shadow-[0_0_24px_rgba(212,175,55,0.18)]
+                "
+                style={{
+                  height: `${Math.max(
+                    8,
+                    (point.value /
+                      max) *
+                      150
+                  )}px`,
+                }}
+                title={formatValue(
+                  point.value
+                )}
+              />
+
+              <div className="text-center">
+                <p className="text-xs text-white/50">
+                  {point.label}
+                </p>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const {
     stats,
@@ -173,7 +255,7 @@ const Dashboard = () => {
         mt-8
         grid
         md:grid-cols-2
-        xl:grid-cols-4
+        xl:grid-cols-5
         gap-6
         "
       >
@@ -295,6 +377,117 @@ const Dashboard = () => {
               stats?.deliveredOrders
             )}
           </h3>
+        </div>
+
+        <div
+          className="
+          rounded-3xl
+          border
+          border-red-500/20
+          bg-red-500/10
+          p-6
+          "
+        >
+          <p
+            className="
+            text-red-400
+            "
+          >
+            Cancelled
+          </p>
+
+          <h3
+            className="
+            text-4xl
+            font-bold
+            mt-3
+            "
+          >
+            {formatNumber(
+              stats?.cancelledOrders
+            )}
+          </h3>
+        </div>
+      </div>
+
+      {/* CHARTS */}
+
+      <div
+        className="
+        mt-8
+        grid
+        xl:grid-cols-3
+        gap-6
+        "
+      >
+        <MiniBarChart
+          title="Revenue Trend"
+          data={
+            stats?.revenueTrend ||
+            []
+          }
+          formatValue={
+            currencyFormatter.format
+          }
+        />
+
+        <MiniBarChart
+          title="Orders Trend"
+          data={
+            stats?.ordersTrend ||
+            []
+          }
+        />
+
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+          <h2 className="text-xl font-semibold mb-6">
+            Status Distribution
+          </h2>
+
+          <div className="space-y-4">
+            {(stats?.statusDistribution ||
+              []
+            ).map(
+              (
+                item
+              ) => {
+                const total =
+                  stats?.totalOrders ||
+                  1;
+
+                return (
+                  <div
+                    key={
+                      item.status
+                    }
+                  >
+                    <div className="flex justify-between text-sm capitalize">
+                      <span>
+                        {item.status}
+                      </span>
+
+                      <span className="text-white/50">
+                        {item.count}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[#D4AF37]"
+                        style={{
+                          width: `${Math.round(
+                            (item.count /
+                              total) *
+                              100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+            )}
+          </div>
         </div>
       </div>
 

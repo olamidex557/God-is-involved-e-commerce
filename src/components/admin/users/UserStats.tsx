@@ -1,9 +1,6 @@
-interface User {
-  _id: string;
-  role: string;
-  totalSpent: number;
-  createdAt: string;
-}
+import type {
+  User,
+} from "../../../types/user";
 
 interface Props {
   users: User[];
@@ -18,7 +15,8 @@ const UserStats = ({
   const vipCustomers =
     users.filter(
       (user) =>
-        user.totalSpent >=
+        (user.totalSpent ||
+          0) >=
         100000
     ).length;
 
@@ -52,7 +50,8 @@ const UserStats = ({
         user
       ) =>
         total +
-        user.totalSpent,
+        (user.totalSpent ||
+          0),
       0
     );
 

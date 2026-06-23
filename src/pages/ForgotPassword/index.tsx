@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react";
+import axios from "axios";
 
 import {
   Link,
@@ -52,12 +53,16 @@ const ForgotPassword = () => {
           response.message
         );
       } catch (
-        error: any
+        error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-            "Unable to send reset email"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Unable to send reset email"
+            : "Unable to send reset email"
         );
       } finally {
         setLoading(false);

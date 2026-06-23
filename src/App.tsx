@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import Contact from "./pages/Contact";
 import Quotation from "./pages/Quotation";
 import OrderSuccess from "./pages/OrderSuccess";
+import TrackOrder from "./pages/TrackOrder";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -132,6 +133,11 @@ function App() {
         <Route
           path="/order-success"
           element={<OrderSuccess />}
+        />
+
+        <Route
+          path="/track-order"
+          element={<TrackOrder />}
         />
 
         <Route

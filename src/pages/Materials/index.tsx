@@ -1,13 +1,47 @@
 import { Link } from "react-router-dom";
+import {
+  useState,
+} from "react";
 
 import Container from "../../components/ui/Container";
 import { useProducts } from "../../hooks/useProducts";
 
 const Materials = () => {
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    category,
+    setCategory,
+  ] = useState("");
+
+  const [
+    minPrice,
+    setMinPrice,
+  ] = useState("");
+
+  const [
+    maxPrice,
+    setMaxPrice,
+  ] = useState("");
+
+  const [
+    sort,
+    setSort,
+  ] = useState("newest");
+
   const {
     products,
     loading,
-  } = useProducts();
+  } = useProducts({
+    search,
+    category,
+    minPrice,
+    maxPrice,
+    sort,
+  });
 
   return (
     <div className="pt-32 pb-32">
@@ -48,6 +82,171 @@ const Materials = () => {
             materials curated for
             luxury interior projects.
           </p>
+        </div>
+
+        {/* FILTERS */}
+
+        <div
+          className="
+          mb-12
+          border
+          border-white/10
+          rounded-[32px]
+          bg-white/[0.03]
+          p-5
+          md:p-6
+          "
+        >
+          <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <input
+              value={search}
+              onChange={(
+                event
+              ) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Search products"
+              className="
+              rounded-2xl
+              bg-zinc-950
+              border
+              border-white/10
+              px-5
+              py-4
+              outline-none
+              focus:border-[#D4AF37]/70
+              xl:col-span-2
+              "
+            />
+
+            <select
+              value={category}
+              onChange={(
+                event
+              ) =>
+                setCategory(
+                  event.target.value
+                )
+              }
+              className="
+              rounded-2xl
+              bg-zinc-950
+              border
+              border-white/10
+              px-5
+              py-4
+              outline-none
+              "
+            >
+              <option value="">
+                All Categories
+              </option>
+
+              <option value="MDF">
+                MDF
+              </option>
+
+              <option value="HDF">
+                HDF
+              </option>
+
+              <option value="Plywood">
+                Plywood
+              </option>
+
+              <option value="Accessories">
+                Accessories
+              </option>
+            </select>
+
+            <select
+              value={sort}
+              onChange={(
+                event
+              ) =>
+                setSort(
+                  event.target.value
+                )
+              }
+              className="
+              rounded-2xl
+              bg-zinc-950
+              border
+              border-white/10
+              px-5
+              py-4
+              outline-none
+              "
+            >
+              <option value="newest">
+                Newest
+              </option>
+
+              <option value="price-low">
+                Price Low to High
+              </option>
+
+              <option value="price-high">
+                Price High to Low
+              </option>
+
+              <option value="featured">
+                Featured
+              </option>
+            </select>
+
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                value={minPrice}
+                onChange={(
+                  event
+                ) =>
+                  setMinPrice(
+                    event.target.value
+                  )
+                }
+                inputMode="numeric"
+                placeholder="Min ₦"
+                className="
+                min-w-0
+                rounded-2xl
+                bg-zinc-950
+                border
+                border-white/10
+                px-4
+                py-4
+                outline-none
+                focus:border-[#D4AF37]/70
+                "
+              />
+
+              <input
+                value={maxPrice}
+                onChange={(
+                  event
+                ) =>
+                  setMaxPrice(
+                    event.target.value
+                  )
+                }
+                inputMode="numeric"
+                placeholder="Max ₦"
+                className="
+                min-w-0
+                rounded-2xl
+                bg-zinc-950
+                border
+                border-white/10
+                px-4
+                py-4
+                outline-none
+                focus:border-[#D4AF37]/70
+                "
+              />
+            </div>
+          </div>
         </div>
 
         {/* LOADING */}

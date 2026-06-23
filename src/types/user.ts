@@ -6,6 +6,8 @@ export interface User {
   email: string;
   role: string;
   verified?: boolean;
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
+  totalOrders?: number;
+  totalSpent?: number;
 }

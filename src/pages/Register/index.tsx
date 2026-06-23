@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react";
+import axios from "axios";
 
 import {
   Link,
@@ -100,12 +101,16 @@ const Register = () => {
           )}`
         );
       } catch (
-        error: any
+        error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-            "Registration failed"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Registration failed"
+            : "Registration failed"
         );
       } finally {
         setLoading(false);

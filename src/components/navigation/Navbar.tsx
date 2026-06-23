@@ -64,6 +64,10 @@ const Navbar = () => {
       label: "Contact",
       path: "/contact",
     },
+    {
+      label: "Track Order",
+      path: "/track-order",
+    },
   ];
 
   const handleLogout =

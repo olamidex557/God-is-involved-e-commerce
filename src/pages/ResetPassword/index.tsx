@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react";
+import axios from "axios";
 
 import {
   useNavigate,
@@ -75,12 +76,16 @@ const ResetPassword = () => {
           "/login"
         );
       } catch (
-        error: any
+        error: unknown
       ) {
         setError(
-          error?.response?.data
-            ?.message ||
-            "Reset failed"
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Reset failed"
+            : "Reset failed"
         );
       } finally {
         setLoading(false);

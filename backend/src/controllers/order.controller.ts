@@ -354,6 +354,68 @@ export const getOrderById =
     }
   };
 
+export const trackOrder =
+  async (
+    req: AuthRequest,
+    res: Response
+  ) => {
+    try {
+      const orderNumber =
+        String(
+          req.params.orderNumber ||
+            ""
+        )
+          .trim()
+          .toUpperCase();
+
+      if (!orderNumber) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Order number is required",
+          });
+      }
+
+      const order =
+        await Order.findOne({
+          orderNumber,
+        }).select(
+          "orderNumber paymentStatus status createdAt shippingAddress items totalAmount"
+        );
+
+      if (!order) {
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "Order not found",
+          });
+      }
+
+      return res.json({
+        success: true,
+        order,
+      });
+    } catch (
+      error
+    ) {
+      console.error(
+        error
+      );
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message:
+            "Failed to track order",
+        });
+    }
+  };
+
 export const getAllOrders =
   async (
     req: AuthRequest,

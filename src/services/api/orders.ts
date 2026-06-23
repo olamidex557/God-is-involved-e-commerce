@@ -1,6 +1,6 @@
 import { api } from "./client";
 
-import type{
+import type {
   Order,
   CreateOrderPayload,
 } from "../../types/order";
@@ -24,7 +24,10 @@ export const createOrder =
   };
 
 export const getMyOrders =
-  async () => {
+  async (): Promise<{
+    success: boolean;
+    orders: Order[];
+  }> => {
     const response =
       await api.get(
         "/orders/my-orders"
@@ -34,7 +37,10 @@ export const getMyOrders =
   };
 
 export const getAllOrders =
-  async () => {
+  async (): Promise<{
+    success: boolean;
+    orders: Order[];
+  }> => {
     const response =
       await api.get(
         "/orders"
@@ -54,6 +60,23 @@ export const updateOrderStatus =
         {
           status,
         }
+      );
+
+    return response.data;
+  };
+
+export const trackOrder =
+  async (
+    orderNumber: string
+  ): Promise<{
+    success: boolean;
+    order: Order;
+  }> => {
+    const response =
+      await api.get(
+        `/orders/track/${encodeURIComponent(
+          orderNumber
+        )}`
       );
 
     return response.data;

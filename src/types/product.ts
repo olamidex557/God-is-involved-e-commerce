@@ -21,11 +21,11 @@ export interface Product {
 
   thicknesses?: string[];
 
-  stock?: number;
+  stock: number;
 
-  lowStockThreshold?: number;
+  lowStockThreshold: number;
 
-  inStock?: boolean;
+  inStock: boolean;
 }
 
 export type ProductPayload =

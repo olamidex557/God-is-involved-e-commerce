@@ -4,7 +4,9 @@ export interface RecentOrder {
   _id: string;
   orderNumber: string;
   status: string;
+  paymentStatus: string;
   totalAmount: number;
+  createdAt: string;
 }
 
 export interface LowStockProduct {
@@ -30,6 +32,7 @@ export interface DashboardStats {
   processingOrders: number;
   shippedOrders: number;
   deliveredOrders: number;
+  cancelledOrders: number;
 
   healthyProducts: number;
   criticalProducts: number;
@@ -40,6 +43,21 @@ export interface DashboardStats {
   lowStockProducts: LowStockProduct[];
 
   recentOrders: RecentOrder[];
+
+  revenueTrend: {
+    label: string;
+    value: number;
+  }[];
+
+  ordersTrend: {
+    label: string;
+    value: number;
+  }[];
+
+  statusDistribution: {
+    status: string;
+    count: number;
+  }[];
 }
 
 export const getDashboardStats =

@@ -1,0 +1,104 @@
+import {
+  z,
+} from "zod";
+
+const objectId =
+  z
+    .string()
+    .trim()
+    .min(
+      1,
+      "productId is required"
+    );
+
+export const createOrderSchema =
+  z.object({
+    items:
+      z
+        .array(
+          z.object({
+            productId:
+              objectId,
+            name:
+              z
+                .string()
+                .optional(),
+            price:
+              z
+                .number()
+                .optional(),
+            quantity:
+              z
+                .number()
+                .int()
+                .positive(),
+            image:
+              z
+                .string()
+                .optional(),
+          })
+        )
+        .min(
+          1,
+          "Order items are required"
+        ),
+    subtotal:
+      z
+        .number()
+        .optional(),
+    shippingFee:
+      z
+        .number()
+        .min(0)
+        .optional(),
+    totalAmount:
+      z
+        .number()
+        .optional(),
+    paymentMethod:
+      z
+        .string()
+        .default(
+          "paystack"
+        ),
+    shippingAddress:
+      z.object({
+        fullName:
+          z
+            .string()
+            .trim()
+            .min(1),
+        phone:
+          z
+            .string()
+            .trim()
+            .min(1),
+        address:
+          z
+            .string()
+            .trim()
+            .min(1),
+        city:
+          z
+            .string()
+            .trim()
+            .min(1),
+        state:
+          z
+            .string()
+            .trim()
+            .min(1),
+      }),
+  });
+
+export const updateOrderStatusSchema =
+  z.object({
+    status:
+      z.enum([
+        "pending",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ]),
+  });

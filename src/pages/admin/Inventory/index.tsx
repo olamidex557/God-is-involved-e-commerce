@@ -8,12 +8,15 @@ import {
   getProducts,
   updateProductStock,
 } from "../../../services/api/adminProducts";
+import type {
+  Product,
+} from "../../../types/product";
 
 const Inventory = () => {
   const [
     products,
     setProducts,
-  ] = useState<any[]>([]);
+  ] = useState<Product[]>([]);
 
   const [
     loading,
@@ -71,11 +74,10 @@ const adjustStock =
       );
 
       await loadProducts();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(
         "UPDATE FAILED",
-        error?.response?.data ||
-          error
+        error
       );
     }
   };

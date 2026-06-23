@@ -1,7 +1,55 @@
 import mongoose from "mongoose";
 
+export type OrderStatus =
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
+
+export type PaymentStatus =
+    | "pending"
+    | "paid"
+    | "failed"
+    | "refunded";
+
+export interface OrderItem {
+    productId: mongoose.Types.ObjectId;
+    name: string;
+    price: number;
+    quantity: number;
+    image: string;
+}
+
+export interface ShippingAddress {
+    fullName?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+}
+
+export interface OrderDocument {
+    orderNumber: string;
+    user: mongoose.Types.ObjectId;
+    items: OrderItem[];
+    subtotal: number;
+    shippingFee: number;
+    totalAmount: number;
+    status: OrderStatus;
+    paymentStatus: PaymentStatus;
+    paymentMethod: string;
+    paystackReference?: string;
+    paystackTransactionId?: string;
+    paidAt?: Date;
+    paymentFailureReason?: string;
+    shippingAddress?: ShippingAddress;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 const orderItemSchema =
-    new mongoose.Schema({
+    new mongoose.Schema<OrderItem>({
         productId: {
             type:
                 mongoose.Schema.Types.ObjectId,
@@ -31,7 +79,7 @@ const orderItemSchema =
     });
 
 const orderSchema =
-    new mongoose.Schema(
+    new mongoose.Schema<OrderDocument>(
         {
             orderNumber: {
                 type: String,
@@ -94,6 +142,28 @@ const orderSchema =
                 type: String,
                 default:
                     "paystack",
+            },
+
+            paystackReference: {
+                type: String,
+                default: null,
+                index: true,
+                sparse: true,
+            },
+
+            paystackTransactionId: {
+                type: String,
+                default: null,
+            },
+
+            paidAt: {
+                type: Date,
+                default: null,
+            },
+
+            paymentFailureReason: {
+                type: String,
+                default: null,
             },
 
             shippingAddress:

@@ -2,18 +2,39 @@ export const formatNewOrderAlert =
   (
     orderNumber: string,
     customer: string,
-    amount: number
+    amount: number,
+    items: {
+      name: string;
+      quantity: number;
+    }[]
   ) => {
+    const products =
+      items
+        .map(
+          (
+            item
+          ) =>
+            `• ${item.name} × ${item.quantity}`
+        )
+        .join("\n");
+
     return `
 🛒 NEW ORDER
 
-Order: ${orderNumber}
+Order:
+${orderNumber}
 
-Customer: ${customer}
+Customer:
+${customer}
 
-Amount: ₦${amount.toLocaleString()}
+Products:
+${products}
 
-Status: Pending
+Amount:
+₦${amount.toLocaleString()}
+
+Status:
+Pending Payment
 `;
   };
 
@@ -25,9 +46,11 @@ export const formatLowStockAlert =
     return `
 ⚠️ LOW STOCK
 
-Product: ${productName}
+Product:
+${productName}
 
-Remaining Stock: ${stock}
+Remaining Stock:
+${stock}
 `;
   };
 
@@ -38,6 +61,61 @@ export const formatOutOfStockAlert =
     return `
 🚨 OUT OF STOCK
 
-Product: ${productName}
+Product:
+${productName}
 `;
   };
+
+export const formatPaymentReceivedAlert =
+  (
+    orderNumber: string,
+    customer: string,
+    amount: number,
+    items: {
+      name: string;
+      quantity: number;
+    }[]
+  ) => {
+    const products =
+      items
+        .map(
+          (
+            item
+          ) =>
+            `• ${item.name} × ${item.quantity}`
+        )
+        .join("\n");
+
+    return `
+💳 PAYMENT RECEIVED
+
+Order:
+${orderNumber}
+
+Customer:
+${customer}
+
+Products:
+${products}
+
+Amount:
+₦${amount.toLocaleString()}
+
+Status:
+Paid
+`;
+  };
+
+export const formatPaymentFailedAlert =
+  (
+    orderNumber: string,
+    amount: number
+  ) => `
+❌ PAYMENT FAILED
+
+Order:
+${orderNumber}
+
+Amount:
+₦${amount.toLocaleString()}
+`;

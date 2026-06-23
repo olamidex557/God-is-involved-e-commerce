@@ -6,13 +6,16 @@ import {
 import {
   getPaymentStats,
 } from "../../services/api/payments";
+import type {
+  PaymentStats,
+} from "../../types/payment";
 
 export const usePayments =
   () => {
     const [
       stats,
       setStats,
-    ] = useState<any>(
+    ] = useState<PaymentStats | null>(
       null
     );
 

@@ -1,5 +1,9 @@
+import type {
+  Product,
+} from "../../../types/product";
+
 interface Props {
-  product: any;
+  product: Product;
   onDelete: (
     id: string
   ) => void;

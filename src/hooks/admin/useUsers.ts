@@ -6,13 +6,16 @@ import {
 import {
   getUsers,
 } from "../../services/api/users";
+import type {
+  User,
+} from "../../types/user";
 
 export const useUsers =
   () => {
     const [
       users,
       setUsers,
-    ] = useState<any[]>(
+    ] = useState<User[]>(
       []
     );
 

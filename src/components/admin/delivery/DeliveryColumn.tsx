@@ -1,8 +1,11 @@
 import DeliveryCard from "./DeliveryCard";
+import type {
+  Order,
+} from "../../../types/order";
 
 interface Props {
   title: string;
-  deliveries: any[];
+  deliveries: Order[];
 }
 
 const DeliveryColumn = ({
@@ -40,7 +43,7 @@ const DeliveryColumn = ({
           (delivery) => (
             <DeliveryCard
               key={
-                delivery.orderId
+                delivery._id
               }
               delivery={delivery}
             />

@@ -6,13 +6,16 @@ import {
 import {
   getDeliveryOrders,
 } from "../../services/api/delivery";
+import type {
+  Order,
+} from "../../types/order";
 
 export const useDelivery =
   () => {
     const [
       orders,
       setOrders,
-    ] = useState<any[]>(
+    ] = useState<Order[]>(
       []
     );
 

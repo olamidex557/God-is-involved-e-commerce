@@ -5,6 +5,7 @@ export type BotIntent =
   | "summary"
   | "today"
   | "low-stock"
+  | "out-of-stock"
   | "top-products"
   | "unknown";
 
@@ -54,6 +55,14 @@ export const detectIntent =
       )
     ) {
       return "today";
+    }
+
+    if (
+      message.includes(
+        "out of stock"
+      )
+    ) {
+      return "out-of-stock";
     }
 
     if (

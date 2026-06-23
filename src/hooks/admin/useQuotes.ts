@@ -6,13 +6,16 @@ import {
 import {
   getQuotes,
 } from "../../services/api/quotes";
+import type {
+  Quote,
+} from "../../types/quotation";
 
 export const useQuotes =
   () => {
     const [
       quotes,
       setQuotes,
-    ] = useState<any[]>(
+    ] = useState<Quote[]>(
       []
     );
 

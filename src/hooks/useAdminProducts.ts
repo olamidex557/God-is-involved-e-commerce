@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 
 import { api } from "../services/api/client";
+import type {
+  Product,
+} from "../types/product";
 
 export const useAdminProducts = () => {
   const [products, setProducts] =
-    useState<any[]>([]);
+    useState<Product[]>([]);
 
   const [loading, setLoading] =
     useState(true);

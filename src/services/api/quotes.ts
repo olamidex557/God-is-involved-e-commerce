@@ -1,4 +1,7 @@
 import { api } from "./client";
+import type {
+  CreateQuotePayload,
+} from "../../types/quotation";
 
 export const getQuotes =
   async () => {
@@ -12,7 +15,7 @@ export const getQuotes =
 
 export const createQuote =
   async (
-    quote: any
+    quote: CreateQuotePayload
   ) => {
     const response =
       await api.post(

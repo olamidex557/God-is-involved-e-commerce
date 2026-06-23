@@ -6,6 +6,9 @@ import {
 import {
   getProduct,
 } from "../services/api/products";
+import type {
+  Product,
+} from "../types/product";
 
 export const useProduct = (
   id: string
@@ -13,7 +16,7 @@ export const useProduct = (
   const [
     product,
     setProduct,
-  ] = useState<any>(null);
+  ] = useState<Product | null>(null);
 
   const [
     loading,

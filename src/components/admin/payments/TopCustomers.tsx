@@ -1,5 +1,9 @@
+import type {
+  PaymentCustomer,
+} from "../../../types/payment";
+
 interface Props {
-  customers: any[];
+  customers: PaymentCustomer[];
 }
 
 const TopCustomers = ({

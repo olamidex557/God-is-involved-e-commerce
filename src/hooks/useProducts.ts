@@ -6,13 +6,16 @@ import {
 import {
   getProducts,
 } from "../services/api/products";
+import type {
+  Product,
+} from "../types/product";
 
 export const useProducts =
   () => {
     const [
       products,
       setProducts,
-    ] = useState<any[]>([]);
+    ] = useState<Product[]>([]);
 
     const [
       loading,

@@ -1,7 +1,20 @@
+import {
+  lazy,
+  Suspense,
+} from "react";
+
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
 
 import showroom from "../../assets/images/location/showroom.jpg";
+
+const GoogleLocationMap =
+  lazy(
+    () =>
+      import(
+        "../../components/maps/GoogleLocationMap"
+      )
+  );
 
 const Contact = () => {
   return (
@@ -219,24 +232,15 @@ const Contact = () => {
         <div
           className="
           mt-20
-          border
-          border-white/10
-          rounded-[40px]
-          overflow-hidden
           "
         >
-          <div
-            className="
-            h-[400px]
-            bg-zinc-900
-            flex
-            items-center
-            justify-center
-            text-white/40
-            "
+          <Suspense
+            fallback={
+              <div className="h-[420px] rounded-[32px] border border-white/10 bg-zinc-900" />
+            }
           >
-            Google Maps Integration Here
-          </div>
+            <GoogleLocationMap />
+          </Suspense>
         </div>
       </Container>
     </div>

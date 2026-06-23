@@ -1,4 +1,7 @@
 import { api } from "./client";
+import type {
+  ProductPayload,
+} from "../../types/product";
 
 export const getProducts =
   async () => {
@@ -12,7 +15,7 @@ export const getProducts =
 
 export const createProduct =
   async (
-    product: any
+    product: ProductPayload
   ) => {
     const response =
       await api.post(
@@ -26,7 +29,7 @@ export const createProduct =
 export const updateProduct =
   async (
     id: string,
-    product: any
+    product: ProductPayload
   ) => {
     const response =
       await api.put(

@@ -1,7 +1,13 @@
 export interface Product {
+  _id: string;
+
   id: string;
 
   name: string;
+
+  slug?: string;
+
+  category: string;
 
   price: number;
 
@@ -9,9 +15,23 @@ export interface Product {
 
   images: string[];
 
-  colors: string[];
+  colors?: string[];
 
-  sizes: string[];
+  sizes?: string[];
 
-  thicknesses: string[];
+  thicknesses?: string[];
+
+  stock?: number;
+
+  lowStockThreshold?: number;
+
+  inStock?: boolean;
 }
+
+export type ProductPayload =
+  Partial<
+    Omit<
+      Product,
+      "_id" | "id"
+    >
+  >;

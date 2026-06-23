@@ -1,5 +1,9 @@
+import type {
+  Order,
+} from "../../../types/order";
+
 interface Props {
-  delivery: any;
+  delivery: Order;
 }
 
 const DeliveryCard = ({

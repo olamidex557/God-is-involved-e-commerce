@@ -1,7 +1,22 @@
 import mongoose from "mongoose";
 
+export interface ProductDocument {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  price: number;
+  stock: number;
+  lowStockThreshold: number;
+  inStock: boolean;
+  images: string[];
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const productSchema =
-  new mongoose.Schema(
+  new mongoose.Schema<ProductDocument>(
     {
       name: {
         type: String,

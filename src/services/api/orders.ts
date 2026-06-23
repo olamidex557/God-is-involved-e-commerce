@@ -1,13 +1,19 @@
 import { api } from "./client";
 
 import type{
+  Order,
   CreateOrderPayload,
 } from "../../types/order";
+
+interface CreateOrderResponse {
+  success: boolean;
+  order: Order;
+}
 
 export const createOrder =
   async (
     orderData: CreateOrderPayload
-  ) => {
+  ): Promise<CreateOrderResponse> => {
     const response =
       await api.post(
         "/orders",

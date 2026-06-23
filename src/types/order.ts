@@ -40,6 +40,14 @@ export interface Order {
 
   paymentMethod: string;
 
+  paystackReference?: string;
+
+  paystackTransactionId?: string;
+
+  paidAt?: string;
+
+  paymentFailureReason?: string;
+
   shippingAddress: {
     fullName: string;
 

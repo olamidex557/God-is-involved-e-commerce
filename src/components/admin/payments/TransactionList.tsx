@@ -1,5 +1,9 @@
+import type {
+  PaymentTransaction,
+} from "../../../types/payment";
+
 interface Props {
-  transactions: any[];
+  transactions: PaymentTransaction[];
 }
 
 const TransactionList = ({

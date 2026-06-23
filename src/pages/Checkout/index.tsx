@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
@@ -8,6 +9,9 @@ import { useCartStore } from "../../store/cartStore";
 import { useAuth } from "../../context/AuthContext";
 
 import { createOrder } from "../../services/api/orders";
+import {
+  initializePayment,
+} from "../../services/api/payments";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -16,10 +20,6 @@ const Checkout = () => {
 
   const items = useCartStore(
     (state) => state.items
-  );
-
-  const clearCart = useCartStore(
-    (state) => state.clearCart
   );
 
   const [firstName, setFirstName] =
@@ -137,22 +137,29 @@ const Checkout = () => {
         if (
           response.success
         ) {
-          clearCart();
+          const paymentResponse =
+            await initializePayment(
+              response.order._id
+            );
 
-          navigate(
-            "/order-success"
-          );
+          window.location.href =
+            paymentResponse.payment.authorizationUrl;
         }
       } catch (
-        error: any
+        error: unknown
       ) {
         console.error(
           error
         );
 
         setError(
-          error?.response?.data
-            ?.message ||
+          axios.isAxiosError(
+            error
+          )
+            ? error.response?.data
+                ?.message ||
+                "Unable to initialize payment."
+            :
             "Unable to create order."
         );
       } finally {
@@ -445,8 +452,8 @@ const Checkout = () => {
                   }
                 >
                   {loading
-                    ? "Creating Order..."
-                    : "Place Order"}
+                    ? "Redirecting To Paystack..."
+                    : "Pay With Paystack"}
                 </Button>
               </div>
             </div>

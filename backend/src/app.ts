@@ -1,5 +1,8 @@
 import express from "express";
 import cors from "cors";
+import type {
+  Request,
+} from "express";
 
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
@@ -16,7 +19,24 @@ const app = express();
 
 app.use(cors());
 
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (
+      req,
+      _res,
+      buf
+    ) => {
+      (
+        req as Request & {
+          rawBody?: Buffer;
+        }
+      ).rawBody =
+        Buffer.from(
+          buf
+        );
+    },
+  })
+);
 
 app.get(
   "/",

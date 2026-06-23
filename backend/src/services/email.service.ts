@@ -159,3 +159,100 @@ export const sendResetPasswordEmail =
 
     return result.data;
   };
+
+export const sendPaymentSuccessfulEmail =
+  async (
+    email: string,
+    orderNumber: string,
+    amount: number,
+    items: {
+      name: string;
+      quantity: number;
+    }[]
+  ) => {
+    const products =
+      items
+        .map(
+          (
+            item
+          ) =>
+            `<li>${item.name} × ${item.quantity}</li>`
+        )
+        .join("");
+
+    const result =
+      await resend.emails.send({
+        from:
+          process.env.EMAIL_FROM ||
+          "onboarding@resend.dev",
+
+        to: email,
+
+        subject:
+          "Payment Successful",
+
+        html: `
+          <div
+            style="
+              max-width:600px;
+              margin:auto;
+              font-family:Arial,sans-serif;
+              padding:30px;
+              background:#0f0f0f;
+              color:white;
+              border-radius:20px;
+            "
+          >
+            <h1 style="color:#D4AF37;">
+              Payment Successful
+            </h1>
+
+            <p>
+              Thank you for your payment.
+              Your order is now being processed.
+            </p>
+
+            <div
+              style="
+                margin:24px 0;
+                padding:20px;
+                background:#181818;
+                border-radius:12px;
+              "
+            >
+              <p>
+                <strong>Order number:</strong>
+                ${orderNumber}
+              </p>
+
+              <p>
+                <strong>Amount:</strong>
+                ₦${amount.toLocaleString()}
+              </p>
+
+              <p>
+                <strong>Products:</strong>
+              </p>
+
+              <ul>
+                ${products}
+              </ul>
+            </div>
+
+            <p>
+              Next steps: our team will confirm your order,
+              prepare your materials, and contact you with
+              delivery updates.
+            </p>
+          </div>
+        `,
+      });
+
+    if (result.error) {
+      throw new Error(
+        result.error.message
+      );
+    }
+
+    return result.data;
+  };

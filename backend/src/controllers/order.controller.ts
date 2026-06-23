@@ -2,7 +2,9 @@ import {
   Response,
 } from "express";
 
-import Order from "../models/Order";
+import Order, {
+  OrderItem,
+} from "../models/Order";
 import Product from "../models/Product";
 import User from "../models/User";
 
@@ -25,6 +27,26 @@ const generateOrderNumber =
     return `ORD-${Date.now()}`;
   };
 
+interface CreateOrderItemInput {
+  productId: string;
+  name?: string;
+  image?: string;
+  quantity: number;
+}
+
+interface CreateOrderRequestBody {
+  items: CreateOrderItemInput[];
+  shippingFee?: number;
+  shippingAddress: {
+    fullName?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+  };
+  paymentMethod?: string;
+}
+
 export const createOrder =
   async (
     req: AuthRequest,
@@ -33,12 +55,33 @@ export const createOrder =
     try {
       const {
         items,
-        subtotal,
         shippingFee,
-        totalAmount,
         shippingAddress,
         paymentMethod,
-      } = req.body;
+      } =
+        req.body as CreateOrderRequestBody;
+
+      if (
+        !Array.isArray(
+          items
+        ) ||
+        items.length === 0
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Order items are required",
+          });
+      }
+
+      let calculatedSubtotal =
+        0;
+
+      const orderItems:
+        OrderItem[] =
+        [];
 
       for (const item of items) {
         const product =
@@ -77,7 +120,36 @@ export const createOrder =
               message: `Only ${product.stock} unit(s) of ${product.name} available`,
             });
         }
+
+        calculatedSubtotal +=
+          product.price *
+          item.quantity;
+
+        orderItems.push({
+          productId:
+            product._id,
+          name:
+            product.name,
+          price:
+            product.price,
+          quantity:
+            item.quantity,
+          image:
+            product.images[0] ||
+            item.image ||
+            "",
+        });
       }
+
+      const safeShippingFee =
+        typeof shippingFee ===
+        "number"
+          ? shippingFee
+          : 0;
+
+      const calculatedTotal =
+        calculatedSubtotal +
+        safeShippingFee;
 
       const order =
         await Order.create({
@@ -87,13 +159,17 @@ export const createOrder =
           user:
             req.userId,
 
-          items,
+          items:
+            orderItems,
 
-          subtotal,
+          subtotal:
+            calculatedSubtotal,
 
-          shippingFee,
+          shippingFee:
+            safeShippingFee,
 
-          totalAmount,
+          totalAmount:
+            calculatedTotal,
 
           shippingAddress,
 
@@ -106,7 +182,7 @@ export const createOrder =
             "pending",
         });
 
-      for (const item of items) {
+      for (const item of orderItems) {
         const product =
           await Product.findById(
             item.productId
@@ -143,7 +219,7 @@ export const createOrder =
               );
             }
           } catch (
-            error
+          error
           ) {
             console.error(
               "Stock alert failed:",
@@ -168,11 +244,21 @@ export const createOrder =
           formatNewOrderAlert(
             order.orderNumber,
             customerName,
-            order.totalAmount
+            order.totalAmount,
+            orderItems.map(
+              (
+                item: OrderItem
+              ) => ({
+                name:
+                  item.name,
+                quantity:
+                  item.quantity,
+              })
+            )
           )
         );
       } catch (
-        error
+      error
       ) {
         console.error(
           "Telegram alert failed:",
@@ -185,7 +271,7 @@ export const createOrder =
         order,
       });
     } catch (
-      error
+    error
     ) {
       console.error(
         error
@@ -218,7 +304,7 @@ export const getMyOrders =
         orders,
       });
     } catch (
-      error
+    error
     ) {
       console.error(error);
 
@@ -256,7 +342,7 @@ export const getOrderById =
         order,
       });
     } catch (
-      error
+    error
     ) {
       console.error(error);
 
@@ -285,7 +371,7 @@ export const getAllOrders =
         orders,
       });
     } catch (
-      error
+    error
     ) {
       console.error(error);
 
@@ -330,7 +416,7 @@ export const updateOrderStatus =
         order,
       });
     } catch (
-      error
+    error
     ) {
       console.error(error);
 

@@ -8,12 +8,16 @@ import Container from "../../components/ui/Container";
 import {
   getMyOrders,
 } from "../../services/api/orders";
+import type {
+  Order,
+  OrderItem,
+} from "../../types/order";
 
 const Orders = () => {
   const [
     orders,
     setOrders,
-  ] = useState<any[]>([]);
+  ] = useState<Order[]>([]);
 
   const [
     loading,
@@ -184,7 +188,7 @@ const Orders = () => {
                     <div className="space-y-3">
                       {order.items.map(
                         (
-                          item: any
+                          item: OrderItem
                         ) => (
                           <div
                             key={

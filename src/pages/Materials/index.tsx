@@ -115,7 +115,7 @@ const Materials = () => {
               "
             >
               {products.map(
-                (product: any) => (
+                (product) => (
                   <Link
                     key={product._id}
                     to={`/product/${product._id}`}

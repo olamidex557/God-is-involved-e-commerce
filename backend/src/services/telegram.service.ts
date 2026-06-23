@@ -29,12 +29,21 @@ export const sendTelegramMessage =
 
       return response.data;
     } catch (
-      error: any
+      error: unknown
     ) {
+      const details =
+        axios.isAxiosError(
+          error
+        )
+          ? error.response?.data ||
+            error.message
+          : error instanceof Error
+            ? error.message
+            : error;
+
       console.error(
         "TELEGRAM ERROR:",
-        error?.response?.data ||
-          error.message
+        details
       );
 
       throw error;

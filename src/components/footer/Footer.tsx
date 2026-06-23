@@ -1,5 +1,20 @@
+import {
+  lazy,
+  Suspense,
+} from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo/logo.png";
+import {
+  businessLocation,
+} from "../../config/location";
+
+const GoogleLocationMap =
+  lazy(
+    () =>
+      import(
+        "../maps/GoogleLocationMap"
+      )
+  );
 
 const Footer = () => {
   return (
@@ -169,7 +184,9 @@ const Footer = () => {
               </h3>
 
               <div className="flex flex-col gap-3 text-white/60">
-                <p>419 Oke-Aro Road</p>
+                <p>
+                  {businessLocation.address}
+                </p>
 
                 <p>
                   support@godisinvolved.com
@@ -191,6 +208,19 @@ const Footer = () => {
                 >
                   WhatsApp →
                 </a>
+              </div>
+
+              <div className="mt-6">
+                <Suspense
+                  fallback={
+                    <div className="h-[220px] rounded-[28px] bg-zinc-900" />
+                  }
+                >
+                  <GoogleLocationMap
+                    compact
+                    className="min-h-[220px]"
+                  />
+                </Suspense>
               </div>
             </div>
           </div>

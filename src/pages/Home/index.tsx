@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 
 import Container from "../../components/ui/Container";
@@ -20,7 +25,17 @@ import plywood from "../../assets/images/categories/plywood.jpg";
 import hdf from "../../assets/images/categories/hdf.jpg";
 import accessories from "../../assets/images/categories/accessories.jpg";
 
-import showroom from "../../assets/images/location/showroom.jpg";
+import {
+  businessLocation,
+} from "../../config/location";
+
+const GoogleLocationMap =
+  lazy(
+    () =>
+      import(
+        "../../components/maps/GoogleLocationMap"
+      )
+  );
 
 const Home = () => {
   const heroSlides = [
@@ -770,7 +785,7 @@ const Home = () => {
                   </span>
 
                   <p className="text-white/70 mt-1">
-                    419 Oke-Aro Road
+                    {businessLocation.address}
                   </p>
                 </div>
 
@@ -790,54 +805,19 @@ const Home = () => {
               <div className="mt-10">
                 <Link to="/contact">
                   <Button>
-                    Get Directions
+                    Visit Contact Page
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <div
-              className="
-              relative
-              overflow-hidden
-              rounded-[40px]
-              "
+            <Suspense
+              fallback={
+                <div className="h-[520px] rounded-[32px] border border-white/10 bg-zinc-900" />
+              }
             >
-              <img
-                src={showroom}
-                alt="Showroom"
-                className="
-                w-full
-                h-[350px]
-                md:h-[600px]
-                object-cover
-                "
-              />
-
-              <div
-                className="
-                absolute
-                inset-0
-                bg-black/30
-                "
-              />
-
-              <div
-                className="
-                absolute
-                bottom-8
-                left-8
-                "
-              >
-                <h3 className="text-3xl font-bold">
-                  God Is Involved
-                </h3>
-
-                <p className="text-white/70 mt-2">
-                  Premium Building Materials
-                </p>
-              </div>
-            </div>
+              <GoogleLocationMap />
+            </Suspense>
           </div>
         </Container>
       </Section>

@@ -14,6 +14,9 @@ import {
 import {
   useAuth,
 } from "../../context/AuthContext";
+import type {
+  Order,
+} from "../../types/order";
 
 const Dashboard = () => {
   const { user } =
@@ -22,7 +25,7 @@ const Dashboard = () => {
   const [
     orders,
     setOrders,
-  ] = useState<any[]>([]);
+  ] = useState<Order[]>([]);
 
   const [
     loading,

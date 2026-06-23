@@ -8,11 +8,11 @@ import Button from "../../components/ui/Button";
 
 import showroom from "../../assets/images/location/showroom.jpg";
 
-const GoogleLocationMap =
+const OpenStreetLocationMap =
   lazy(
     () =>
       import(
-        "../../components/maps/GoogleLocationMap"
+        "../../components/maps/OpenStreetLocationMap"
       )
   );
 
@@ -239,7 +239,7 @@ const Contact = () => {
               <div className="h-[420px] rounded-[32px] border border-white/10 bg-zinc-900" />
             }
           >
-            <GoogleLocationMap />
+            <OpenStreetLocationMap />
           </Suspense>
         </div>
       </Container>

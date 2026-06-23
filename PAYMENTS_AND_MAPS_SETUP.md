@@ -1,14 +1,9 @@
 # Payments And Maps Setup
 
-## Google Maps
+## Maps
 
-Add this to the frontend environment file:
-
-```bash
-VITE_GOOGLE_MAPS_API_KEY=your_browser_google_maps_key
-```
-
-Enable the Maps JavaScript API in Google Cloud and restrict the key to the production domain.
+The storefront uses OpenStreetMap tiles through React Leaflet. No map API key,
+billing account, or frontend environment variable is required.
 
 ## Backend Environment
 
@@ -17,7 +12,6 @@ Add these to `backend/.env`:
 ```bash
 PAYSTACK_SECRET_KEY=sk_live_or_test_key
 PAYSTACK_PUBLIC_KEY=pk_live_or_test_key
-GOOGLE_MAPS_API_KEY=your_server_reference_key
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 TELEGRAM_CHAT_ID=your_telegram_chat_id
 FRONTEND_URL=https://your-frontend-domain.com

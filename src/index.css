@@ -26,3 +26,96 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #D4AF37;
 }
+
+.leaflet-container {
+  background: #0B0F14;
+  font-family: Inter, sans-serif;
+}
+
+.leaflet-control-zoom {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(16px);
+}
+
+.leaflet-control-zoom a {
+  width: 38px !important;
+  height: 38px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #D4AF37 !important;
+  line-height: 38px !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(212, 175, 55, 0.12) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  background: rgba(11, 15, 20, 0.96);
+  color: white;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.38);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.leaflet-popup-content strong {
+  color: #D4AF37;
+}
+
+.leaflet-popup-close-button {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.leaflet-control-attribution {
+  border-top-left-radius: 10px;
+  background: rgba(0, 0, 0, 0.58) !important;
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+.leaflet-control-attribution a {
+  color: #D4AF37 !important;
+}
+
+.business-map-marker {
+  position: relative;
+}
+
+.business-map-marker__pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #0B0F14;
+  border-radius: 999px 999px 999px 0;
+  background: #D4AF37;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, -74%) rotate(-45deg);
+}
+
+.business-map-marker__pin::after {
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  background: #0B0F14;
+  content: "";
+}
+
+.business-map-marker__pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.22);
+  transform: translate(-50%, -50%);
+}

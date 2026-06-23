@@ -11,6 +11,7 @@ import {
   AuthProvider,
 } from "./context/AuthContext";
 
+import "leaflet/dist/leaflet.css";
 import "./index.css";
 
 ReactDOM.createRoot(

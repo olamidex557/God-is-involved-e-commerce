@@ -8,16 +8,16 @@ export const businessLocation = {
   },
 };
 
-export const googleMapsApiKey =
-  import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+const locationQuery = `${businessLocation.name} ${businessLocation.address} ${businessLocation.city}`;
+const coordinatePair = `${businessLocation.coordinates.lat},${businessLocation.coordinates.lng}`;
 
-export const googleMapsSearchUrl =
+export const openStreetMapUrl =
+  `https://www.openstreetmap.org/?mlat=${businessLocation.coordinates.lat}&mlon=${businessLocation.coordinates.lng}#map=16/${businessLocation.coordinates.lat}/${businessLocation.coordinates.lng}`;
+
+export const openStreetMapDirectionsUrl =
+  `https://www.openstreetmap.org/directions?to=${coordinatePair}#map=16/${businessLocation.coordinates.lat}/${businessLocation.coordinates.lng}`;
+
+export const googleMapsExternalUrl =
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${businessLocation.name} ${businessLocation.address}`
-  )}`;
-
-export const googleMapsDirectionsUrl =
-  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    `${businessLocation.name} ${businessLocation.address}`
+    locationQuery
   )}`;

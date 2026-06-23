@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import Product from "../models/Product";
 
+type QueryValue =
+  Request["query"][string];
+
 interface ProductFilter {
   $or?: {
     name?: {
@@ -22,6 +25,60 @@ interface ProductFilter {
   };
 }
 
+const getQueryString =
+  (
+    value: QueryValue
+  ) => {
+    if (
+      typeof value !==
+      "string"
+    ) {
+      return undefined;
+    }
+
+    const trimmed =
+      value.trim();
+
+    return trimmed ===
+      ""
+      ? undefined
+      : trimmed;
+  };
+
+const getQueryNumber =
+  (
+    value: QueryValue
+  ) => {
+    const normalized =
+      getQueryString(
+        value
+      );
+
+    if (!normalized) {
+      return undefined;
+    }
+
+    const parsed =
+      Number(
+        normalized
+      );
+
+    return Number.isFinite(
+      parsed
+    )
+      ? parsed
+      : undefined;
+  };
+
+const escapeRegex =
+  (
+    value: string
+  ) =>
+    value.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
+
 export const getProducts = async (
   req: Request,
   res: Response
@@ -35,19 +92,45 @@ export const getProducts = async (
       sort,
     } = req.query;
 
+    const searchTerm =
+      getQueryString(
+        search
+      );
+
+    const categoryTerm =
+      getQueryString(
+        category
+      );
+
+    const minimumPrice =
+      getQueryNumber(
+        minPrice
+      );
+
+    const maximumPrice =
+      getQueryNumber(
+        maxPrice
+      );
+
+    const sortKey =
+      getQueryString(
+        sort
+      );
+
     const filter: ProductFilter =
       {};
 
-    if (
-      typeof search ===
-        "string" &&
-      search.trim()
-    ) {
+    if (searchTerm) {
+      const escapedSearchTerm =
+        escapeRegex(
+          searchTerm
+        );
+
       filter.$or = [
         {
           name: {
             $regex:
-              search.trim(),
+              escapedSearchTerm,
             $options:
               "i",
           },
@@ -55,7 +138,7 @@ export const getProducts = async (
         {
           description: {
             $regex:
-              search.trim(),
+              escapedSearchTerm,
             $options:
               "i",
           },
@@ -63,14 +146,12 @@ export const getProducts = async (
       ];
     }
 
-    if (
-      typeof category ===
-        "string" &&
-      category.trim()
-    ) {
+    if (categoryTerm) {
       filter.category = {
         $regex:
-          `^${category.trim()}$`,
+          `^${escapeRegex(
+            categoryTerm
+          )}$`,
         $options:
           "i",
       };
@@ -82,41 +163,19 @@ export const getProducts = async (
     } = {};
 
     if (
-      typeof minPrice ===
-      "string"
+      minimumPrice !==
+      undefined
     ) {
-      const parsed =
-        Number(
-          minPrice
-        );
-
-      if (
-        Number.isFinite(
-          parsed
-        )
-      ) {
-        priceFilter.$gte =
-          parsed;
-      }
+      priceFilter.$gte =
+        minimumPrice;
     }
 
     if (
-      typeof maxPrice ===
-      "string"
+      maximumPrice !==
+      undefined
     ) {
-      const parsed =
-        Number(
-          maxPrice
-        );
-
-      if (
-        Number.isFinite(
-          parsed
-        )
-      ) {
-        priceFilter.$lte =
-          parsed;
-      }
+      priceFilter.$lte =
+        maximumPrice;
     }
 
     if (
@@ -130,14 +189,14 @@ export const getProducts = async (
 
     const sortOption:
       string =
-      sort ===
-      "price-low"
+      sortKey ===
+        "price-low"
         ? "price"
-        : sort ===
-            "price-high"
+        : sortKey ===
+          "price-high"
           ? "-price"
-          : sort ===
-              "featured"
+          : sortKey ===
+            "featured"
             ? "-featured -createdAt"
             : "-createdAt";
 

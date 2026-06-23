@@ -16,11 +16,30 @@ export const getProducts =
     success: boolean;
     products: Product[];
   }> => {
+    const queryParams =
+      Object.fromEntries(
+        Object.entries(
+          params ?? {}
+        ).filter(
+          (
+            [
+              ,
+              value,
+            ]
+          ) =>
+            typeof value ===
+              "string" &&
+            value.trim() !==
+              ""
+        )
+      );
+
     const response =
       await api.get(
         "/products",
         {
-          params,
+          params:
+            queryParams,
         }
       );
 

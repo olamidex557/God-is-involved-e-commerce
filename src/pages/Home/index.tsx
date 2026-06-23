@@ -29,11 +29,11 @@ import {
   businessLocation,
 } from "../../config/location";
 
-const GoogleLocationMap =
+const OpenStreetLocationMap =
   lazy(
     () =>
       import(
-        "../../components/maps/GoogleLocationMap"
+        "../../components/maps/OpenStreetLocationMap"
       )
   );
 
@@ -816,7 +816,7 @@ const Home = () => {
                 <div className="h-[520px] rounded-[32px] border border-white/10 bg-zinc-900" />
               }
             >
-              <GoogleLocationMap />
+              <OpenStreetLocationMap />
             </Suspense>
           </div>
         </Container>

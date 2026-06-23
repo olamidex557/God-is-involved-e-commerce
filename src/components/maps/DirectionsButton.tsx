@@ -4,8 +4,8 @@ import {
 } from "lucide-react";
 
 import {
-  googleMapsDirectionsUrl,
-  googleMapsSearchUrl,
+  googleMapsExternalUrl,
+  openStreetMapDirectionsUrl,
 } from "../../config/location";
 
 interface DirectionsButtonProps {
@@ -26,7 +26,7 @@ const DirectionsButton = ({
       `}
     >
       <a
-        href={googleMapsDirectionsUrl}
+        href={openStreetMapDirectionsUrl}
         target="_blank"
         rel="noreferrer"
         className="
@@ -50,7 +50,7 @@ const DirectionsButton = ({
       </a>
 
       <a
-        href={googleMapsSearchUrl}
+        href={googleMapsExternalUrl}
         target="_blank"
         rel="noreferrer"
         className="
@@ -72,7 +72,7 @@ const DirectionsButton = ({
         "
       >
         <MapPin size={16} />
-        Open Map
+        Open in Google Maps
       </a>
     </div>
   );

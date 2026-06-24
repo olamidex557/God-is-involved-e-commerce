@@ -10,8 +10,12 @@ export interface RecentOrder {
 }
 
 export interface LowStockProduct {
-  _id: string;
-  name: string;
+  productId: string;
+  productName: string;
+  category: string;
+  color: string;
+  size: string;
+  lowStockThreshold: number;
   stock: number;
 }
 

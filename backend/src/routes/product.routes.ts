@@ -23,6 +23,7 @@ import {
 
 import {
   productSchema,
+  productUpdateSchema,
 } from "../validations/product.validation";
 
 const router = Router();
@@ -52,7 +53,7 @@ router.put(
   protect,
   requireAdmin,
   validateBody(
-    productSchema
+    productUpdateSchema
   ),
   updateProduct
 );

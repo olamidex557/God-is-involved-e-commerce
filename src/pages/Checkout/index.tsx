@@ -49,7 +49,9 @@ const Checkout = () => {
   const subtotal = items.reduce(
     (total, item) =>
       total +
-      item.price * item.quantity,
+      (item.unitPrice ??
+        item.price) *
+        item.quantity,
     0
   );
 
@@ -100,9 +102,17 @@ const Checkout = () => {
         const payload = {
           items: items.map(
             (item) => ({
-              productId: item.id,
+              productId:
+                item.productId ??
+                item.id,
               name: item.name,
-              price: item.price,
+              color:
+                item.color,
+              size:
+                item.size,
+              price:
+                item.unitPrice ??
+                item.price,
               quantity:
                 item.quantity,
               image:
@@ -388,6 +398,15 @@ const Checkout = () => {
                           text-white/50
                           "
                         >
+                          {item.color ?? "Default"} / {item.size ?? "Standard"}
+                        </p>
+
+                        <p
+                          className="
+                          text-sm
+                          text-white/50
+                          "
+                        >
                           Qty:
                           {" "}
                           {
@@ -399,7 +418,8 @@ const Checkout = () => {
                       <p>
                         ₦
                         {(
-                          item.price *
+                          (item.unitPrice ??
+                            item.price) *
                           item.quantity
                         ).toLocaleString()}
                       </p>

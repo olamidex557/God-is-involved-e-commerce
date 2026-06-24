@@ -43,13 +43,19 @@ export const updateProduct =
 export const updateProductStock =
   async (
     id: string,
-    stock: number
+    stock: number,
+    color = "Default",
+    size = "Standard",
+    lowStockThreshold?: number
   ) => {
     const response =
       await api.patch(
         `/products/${id}/stock`,
         {
           stock,
+          color,
+          size,
+          lowStockThreshold,
         }
       );
 

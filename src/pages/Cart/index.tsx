@@ -28,7 +28,8 @@ const Cart = () => {
     items.reduce(
       (total, item) =>
         total +
-        item.price *
+        (item.unitPrice ??
+          item.price) *
           item.quantity,
       0
     );
@@ -128,7 +129,14 @@ const Cart = () => {
 
                         <p className="text-white/60 mt-2">
                           ₦
-                          {item.price.toLocaleString()}
+                          {(
+                            item.unitPrice ??
+                            item.price
+                          ).toLocaleString()}
+                        </p>
+
+                        <p className="text-white/45 text-sm mt-1">
+                          {item.color ?? "Default"} / {item.size ?? "Standard"}
                         </p>
 
                         {/* QUANTITY */}
@@ -193,7 +201,8 @@ const Cart = () => {
                         <p className="mt-6 font-bold">
                           ₦
                           {(
-                            item.price *
+                            (item.unitPrice ??
+                              item.price) *
                             item.quantity
                           ).toLocaleString()}
                         </p>
@@ -286,7 +295,8 @@ const Cart = () => {
                       <span>
                         ₦
                         {(
-                          item.price *
+                          (item.unitPrice ??
+                            item.price) *
                           item.quantity
                         ).toLocaleString()}
                       </span>

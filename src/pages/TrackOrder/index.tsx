@@ -532,6 +532,10 @@ const TrackOrder = () => {
                           </p>
 
                           <p className="text-white/50 text-sm">
+                            {item.color ?? "Default"} / {item.size ?? "Standard"}
+                          </p>
+
+                          <p className="text-white/50 text-sm">
                             Qty {item.quantity}
                           </p>
                         </div>

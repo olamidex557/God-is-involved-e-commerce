@@ -203,7 +203,10 @@ const Orders = () => {
                             <span>
                               {
                                 item.name
-                              }{" "}
+                              }
+                              <span className="block text-xs text-white/45">
+                                {item.color ?? "Default"} / {item.size ?? "Standard"}
+                              </span>
                               ×{" "}
                               {
                                 item.quantity

@@ -11,6 +11,20 @@ import {
 import type {
   Product,
 } from "../../../types/product";
+import {
+  getProductVariantSizes,
+} from "../../../types/product";
+
+interface InventoryRow {
+  productId: string;
+  productName: string;
+  category: string;
+  color: string;
+  size: string;
+  price: number;
+  stock: number;
+  lowStockThreshold: number;
+}
 
 const Inventory = () => {
   const [
@@ -48,77 +62,184 @@ const Inventory = () => {
     loadProducts();
   }, []);
 
-const adjustStock =
-  async (
-    id: string,
-    currentStock: number,
-    amount: number
-  ) => {
-    try {
-      console.log(
-        "Updating",
-        id,
-        currentStock,
-        amount
-      );
+  const rows =
+    useMemo<InventoryRow[]>(
+      () =>
+        products.flatMap(
+          (
+            product
+          ) =>
+            getProductVariantSizes(
+              product
+            ).map(
+              (
+                size
+              ) => ({
+                productId:
+                  product._id,
+                productName:
+                  product.name,
+                category:
+                  product.category,
+                color:
+                  size.color,
+                size:
+                  size.size,
+                price:
+                  size.price,
+                stock:
+                  size.stock,
+                lowStockThreshold:
+                  size.lowStockThreshold,
+              })
+            )
+        ),
+      [products]
+    );
 
-      const response =
+  const filteredRows =
+    useMemo(() => {
+      const query =
+        search
+          .trim()
+          .toLowerCase();
+
+      if (!query) {
+        return rows;
+      }
+
+      return rows.filter(
+        (
+          row
+        ) =>
+          [
+            row.productName,
+            row.category,
+            row.color,
+            row.size,
+          ].some(
+            (
+              value
+            ) =>
+              value
+                .toLowerCase()
+                .includes(
+                  query
+                )
+          )
+      );
+    }, [rows, search]);
+
+  const adjustStock =
+    async (
+      row: InventoryRow,
+      amount: number
+    ) => {
+      try {
         await updateProductStock(
-          id,
-          currentStock + amount
+          row.productId,
+          Math.max(
+            0,
+            row.stock + amount
+          ),
+          row.color,
+          row.size,
+          row.lowStockThreshold
         );
 
-      console.log(
-        "SUCCESS",
-        response
+        await loadProducts();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  const setStockValue =
+    async (
+      row: InventoryRow
+    ) => {
+      const value =
+        window.prompt(
+          "Enter stock quantity",
+          String(row.stock)
+        );
+
+      if (value === null) {
+        return;
+      }
+
+      const stock =
+        Number(value);
+
+      if (
+        !Number.isFinite(stock) ||
+        stock < 0
+      ) {
+        window.alert(
+          "Stock must be zero or greater."
+        );
+
+        return;
+      }
+
+      await updateProductStock(
+        row.productId,
+        stock,
+        row.color,
+        row.size,
+        row.lowStockThreshold
       );
 
       await loadProducts();
-    } catch (error: unknown) {
-      console.error(
-        "UPDATE FAILED",
-        error
+    };
+
+  const setThresholdValue =
+    async (
+      row: InventoryRow
+    ) => {
+      const value =
+        window.prompt(
+          "Enter low stock threshold",
+          String(
+            row.lowStockThreshold
+          )
+        );
+
+      if (value === null) {
+        return;
+      }
+
+      const threshold =
+        Number(value);
+
+      if (
+        !Number.isFinite(
+          threshold
+        ) ||
+        threshold < 0
+      ) {
+        window.alert(
+          "Threshold must be zero or greater."
+        );
+
+        return;
+      }
+
+      await updateProductStock(
+        row.productId,
+        row.stock,
+        row.color,
+        row.size,
+        threshold
       );
-    }
-  };
 
-  const filteredProducts =
-    useMemo(() => {
-      return products.filter(
-        (product) =>
-          product.name
-            .toLowerCase()
-            .includes(
-              search.toLowerCase()
-            )
-      );
-    }, [products, search]);
-
-  const totalProducts =
-    products.length;
-
-  const healthyProducts =
-    products.filter(
-      (product) =>
-        product.stock > 10
-    ).length;
-
-  const lowStockProducts =
-    products.filter(
-      (product) =>
-        product.stock > 0 &&
-        product.stock <= 10
-    ).length;
-
-  const outOfStockProducts =
-    products.filter(
-      (product) =>
-        product.stock === 0
-    ).length;
+      await loadProducts();
+    };
 
   const getStatus =
-    (stock: number) => {
-      if (stock === 0) {
+    (
+      row: InventoryRow
+    ) => {
+      if (row.stock === 0) {
         return {
           label:
             "Out Of Stock",
@@ -129,7 +250,10 @@ const adjustStock =
         };
       }
 
-      if (stock <= 10) {
+      if (
+        row.stock <=
+        row.lowStockThreshold
+      ) {
         return {
           label:
             "Low Stock",
@@ -149,6 +273,32 @@ const adjustStock =
       };
     };
 
+  const healthy =
+    rows.filter(
+      (
+        row
+      ) =>
+        row.stock >
+        row.lowStockThreshold
+    ).length;
+
+  const lowStock =
+    rows.filter(
+      (
+        row
+      ) =>
+        row.stock > 0 &&
+        row.stock <=
+          row.lowStockThreshold
+    ).length;
+
+  const outOfStock =
+    rows.filter(
+      (
+        row
+      ) => row.stock === 0
+    ).length;
+
   return (
     <>
       <div className="mb-8">
@@ -156,86 +306,79 @@ const adjustStock =
           Inventory
         </h1>
 
-        <p className="text-white/50 mt-2">
-          Monitor stock levels and
-          inventory health.
+        <p className="mt-2 text-white/50">
+          Monitor stock by product, color and size.
         </p>
       </div>
 
-      {/* KPI */}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {[
+          [
+            "Variant Sizes",
+            rows.length,
+            "text-white",
+          ],
+          [
+            "Healthy",
+            healthy,
+            "text-green-400",
+          ],
+          [
+            "Low Stock",
+            lowStock,
+            "text-yellow-400",
+          ],
+          [
+            "Out Of Stock",
+            outOfStock,
+            "text-red-400",
+          ],
+        ].map(
+          (
+            [
+              label,
+              value,
+              color,
+            ]
+          ) => (
+            <div
+              key={label}
+              className="rounded-3xl border border-white/10 bg-white/5 p-6"
+            >
+              <p className="text-white/50">
+                {label}
+              </p>
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <p className="text-white/50">
-            Products
-          </p>
-
-          <h2 className="text-4xl font-bold mt-2">
-            {totalProducts}
-          </h2>
-        </div>
-
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <p className="text-white/50">
-            Healthy
-          </p>
-
-          <h2 className="text-4xl font-bold mt-2 text-green-400">
-            {healthyProducts}
-          </h2>
-        </div>
-
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <p className="text-white/50">
-            Low Stock
-          </p>
-
-          <h2 className="text-4xl font-bold mt-2 text-yellow-400">
-            {lowStockProducts}
-          </h2>
-        </div>
-
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <p className="text-white/50">
-            Out Of Stock
-          </p>
-
-          <h2 className="text-4xl font-bold mt-2 text-red-400">
-            {outOfStockProducts}
-          </h2>
-        </div>
+              <h2
+                className={`mt-2 text-4xl font-bold ${color}`}
+              >
+                {value}
+              </h2>
+            </div>
+          )
+        )}
       </div>
-
-      {/* SEARCH */}
 
       <div className="mt-8">
         <input
           value={search}
-          onChange={(e) =>
+          onChange={(
+            event
+          ) =>
             setSearch(
-              e.target.value
+              event.target.value
             )
           }
-          placeholder="Search products..."
-          className="
-          w-full
-          h-14
-          px-5
-          rounded-2xl
-          bg-white/5
-          border
-          border-white/10
-          outline-none
-          "
+          placeholder="Search product, color or size..."
+          className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-5 outline-none"
         />
       </div>
 
-      {/* TABLE */}
-
-      <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
-        <div className="grid grid-cols-6 gap-4 p-5 border-b border-white/10 font-semibold">
+      <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+        <div className="grid gap-4 border-b border-white/10 p-5 font-semibold lg:grid-cols-7">
           <span>Product</span>
-          <span>Category</span>
+          <span>Color</span>
+          <span>Size</span>
           <span>Price</span>
           <span>Stock</span>
           <span>Status</span>
@@ -246,127 +389,108 @@ const adjustStock =
           <div className="p-6">
             Loading...
           </div>
-        ) : filteredProducts.length ===
+        ) : filteredRows.length ===
           0 ? (
           <div className="p-6">
-            No products found.
+            No inventory found.
           </div>
         ) : (
-          filteredProducts.map(
-            (product) => {
+          filteredRows.map(
+            (
+              row
+            ) => {
               const status =
                 getStatus(
-                  product.stock
+                  row
                 );
 
               return (
                 <div
-                  key={
-                    product._id
-                  }
-                  className="
-                  grid
-                  grid-cols-6
-                  gap-4
-                  p-5
-                  border-b
-                  border-white/10
-                  items-center
-                  "
+                  key={`${row.productId}-${row.color}-${row.size}`}
+                  className="grid gap-4 border-b border-white/10 p-5 last:border-0 lg:grid-cols-7 lg:items-center"
                 >
                   <span>
-                    {
-                      product.name
-                    }
+                    {row.productName}
+                    <span className="block text-sm text-white/45">
+                      {row.category}
+                    </span>
                   </span>
 
                   <span>
-                    {
-                      product.category
-                    }
+                    {row.color}
+                  </span>
+
+                  <span>
+                    {row.size}
                   </span>
 
                   <span>
                     ₦
-                    {product.price?.toLocaleString()}
+                    {row.price.toLocaleString()}
                   </span>
 
                   <span>
-                    {
-                      product.stock
-                    }
+                    {row.stock} / threshold {row.lowStockThreshold}
                   </span>
 
                   <span
-                    className={`
-                    px-3
-                    py-2
-                    rounded-full
-                    text-center
-                    ${status.bg}
-                    ${status.color}
-                    `}
+                    className={`rounded-full px-3 py-2 text-center ${status.bg} ${status.color}`}
                   >
-                    {
-                      status.label
-                    }
+                    {status.label}
                   </span>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() =>
                         adjustStock(
-                          product._id,
-                          product.stock,
-                          10
+                          row,
+                          -10
                         )
                       }
-                      className="
-                      px-3
-                      py-2
-                      rounded-xl
-                      bg-green-500/20
-                      text-green-400
-                      "
+                      className="rounded-xl bg-white/10 px-3 py-2 text-white/70"
                     >
-                      +10
+                      -10
+                    </button>
+
+                    {[10, 50, 100].map(
+                      (
+                        amount
+                      ) => (
+                        <button
+                          key={amount}
+                          onClick={() =>
+                            adjustStock(
+                              row,
+                              amount
+                            )
+                          }
+                          className="rounded-xl bg-[#D4AF37]/20 px-3 py-2 text-[#D4AF37]"
+                        >
+                          +{amount}
+                        </button>
+                      )
+                    )}
+
+                    <button
+                      onClick={() =>
+                        setStockValue(
+                          row
+                        )
+                      }
+                      className="rounded-xl border border-white/10 px-3 py-2 text-white/70"
+                    >
+                      Set Stock
                     </button>
 
                     <button
                       onClick={() =>
-                        adjustStock(
-                          product._id,
-                          product.stock,
-                          50
+                        setThresholdValue(
+                          row
                         )
                       }
-                      className="
-                      px-3
-                      py-2
-                      rounded-xl
-                      bg-blue-500/20
-                      "
+                      className="rounded-xl border border-white/10 px-3 py-2 text-white/70"
                     >
-                      +50
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        adjustStock(
-                          product._id,
-                          product.stock,
-                          100
-                        )
-                      }
-                      className="
-                      px-3
-                      py-2
-                      rounded-xl
-                      bg-[#D4AF37]/20
-                      text-[#D4AF37]
-                      "
-                    >
-                      +100
+                      Set Threshold
                     </button>
                   </div>
                 </div>

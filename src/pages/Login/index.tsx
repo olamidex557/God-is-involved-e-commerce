@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
 } from "react";
 import axios from "axios";
@@ -45,6 +46,20 @@ const Login = () => {
     error,
     setError,
   ] = useState("");
+
+  useEffect(() => {
+    const authMessage =
+      sessionStorage.getItem(
+        "authMessage"
+      );
+
+    if (authMessage) {
+      setError(authMessage);
+      sessionStorage.removeItem(
+        "authMessage"
+      );
+    }
+  }, []);
 
   const handleSubmit =
     async (

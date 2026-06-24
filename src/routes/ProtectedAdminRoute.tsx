@@ -11,14 +11,6 @@ const ProtectedAdminRoute = () => {
         token,
     } = useAuth();
 
-    console.log("TOKEN =", token);
-    console.log("USER =", user);
-    console.log("ROLE =", user?.role);
-
-    console.log("TOKEN =", token);
-    console.log("USER =", user);
-    console.log("ROLE =", user?.role);
-
     if (!token) {
         return (
             <Navigate

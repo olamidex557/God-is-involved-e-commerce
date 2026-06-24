@@ -160,6 +160,10 @@ const notifyPaymentSuccess =
         ) => ({
           name:
             item.name,
+          color:
+            item.color,
+          size:
+            item.size,
           quantity:
             item.quantity,
         })

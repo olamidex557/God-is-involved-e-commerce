@@ -1,18 +1,36 @@
 import type {
   Product,
 } from "../../../types/product";
+import {
+  getProductStartingPrice,
+  getProductTotalStock,
+} from "../../../types/product";
 
 interface Props {
   product: Product;
   onDelete: (
     id: string
   ) => void;
+  onEdit: (
+    product: Product
+  ) => void;
 }
 
 const ProductCard = ({
   product,
-  onDelete
+  onDelete,
+  onEdit,
 }: Props) => {
+  const totalStock =
+    getProductTotalStock(
+      product
+    );
+
+  const startingPrice =
+    getProductStartingPrice(
+      product
+    );
+
   return (
     <div
       className="
@@ -82,6 +100,10 @@ const ProductCard = ({
           {product.description}
         </p>
 
+        <p className="mt-3 text-sm text-white/45">
+          {totalStock} units across variants
+        </p>
+
         <div
           className="
   mt-5
@@ -97,7 +119,7 @@ const ProductCard = ({
     "
           >
             ₦
-            {product.price?.toLocaleString()}
+            {startingPrice.toLocaleString()}
           </span>
 
           <div
@@ -107,6 +129,11 @@ const ProductCard = ({
     "
           >
             <button
+              onClick={() =>
+                onEdit(
+                  product
+                )
+              }
               className="
       px-3
       py-1

@@ -1,4 +1,6 @@
 import {
+  useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -13,6 +15,9 @@ import Button from "../../components/ui/Button";
 import {
   useProduct,
 } from "../../hooks/useProduct";
+import {
+  getProductVariants,
+} from "../../types/product";
 
 import {
   useCartStore,
@@ -42,6 +47,77 @@ const Product = () => {
     activeImage,
     setActiveImage,
   ] = useState(0);
+
+  const [
+    selectedColor,
+    setSelectedColor,
+  ] = useState("");
+
+  const [
+    selectedSize,
+    setSelectedSize,
+  ] = useState("");
+
+  const variants =
+    useMemo(
+      () =>
+        product
+          ? getProductVariants(
+              product
+            )
+          : [],
+      [product]
+    );
+
+  const selectedVariant =
+    variants.find(
+      (
+        variant
+      ) =>
+        variant.color ===
+        selectedColor
+    ) ?? variants[0];
+
+  const selectedSizeOption =
+    selectedVariant?.sizes.find(
+      (
+        size
+      ) =>
+        size.size ===
+        selectedSize
+    ) ?? selectedVariant?.sizes[0];
+
+  useEffect(() => {
+    if (
+      !selectedColor &&
+      variants[0]
+    ) {
+      setSelectedColor(
+        variants[0].color
+      );
+    }
+  }, [selectedColor, variants]);
+
+  useEffect(() => {
+    if (
+      selectedVariant &&
+      !selectedVariant.sizes.some(
+        (
+          size
+        ) =>
+          size.size ===
+          selectedSize
+      )
+    ) {
+      setSelectedSize(
+        selectedVariant.sizes[0]
+          ?.size ?? ""
+      );
+    }
+  }, [
+    selectedSize,
+    selectedVariant,
+  ]);
 
   if (loading) {
     return (
@@ -182,7 +258,10 @@ const Product = () => {
               "
             >
               ₦
-              {product.price.toLocaleString()}
+              {(
+                selectedSizeOption?.price ??
+                product.price
+              ).toLocaleString()}
             </p>
 
             <p
@@ -197,27 +276,128 @@ const Product = () => {
               }
             </p>
 
-            <div
-              className="
-              mt-8
-              "
-            >
+            <div className="mt-8 space-y-6">
+              <div>
+                <p className="mb-3 text-sm uppercase tracking-[0.25em] text-white/45">
+                  Color
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+                  {variants.map(
+                    (
+                      variant
+                    ) => (
+                      <button
+                        key={
+                          variant.color
+                        }
+                        type="button"
+                        onClick={() =>
+                          setSelectedColor(
+                            variant.color
+                          )
+                        }
+                        className={`
+                        rounded-full
+                        border
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        transition
+                        ${selectedColor ===
+                          variant.color
+                          ? "border-[#D4AF37] bg-[#D4AF37] text-black"
+                          : "border-white/10 text-white hover:border-[#D4AF37]/60"
+                        }
+                        `}
+                      >
+                        {variant.color}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-3 text-sm uppercase tracking-[0.25em] text-white/45">
+                  Size
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+                  {selectedVariant?.sizes.map(
+                    (
+                      size
+                    ) => (
+                      <button
+                        key={
+                          size.size
+                        }
+                        type="button"
+                        onClick={() =>
+                          setSelectedSize(
+                            size.size
+                          )
+                        }
+                        className={`
+                        rounded-full
+                        border
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        transition
+                        ${selectedSize ===
+                          size.size
+                          ? "border-[#D4AF37] bg-[#D4AF37] text-black"
+                          : "border-white/10 text-white hover:border-[#D4AF37]/60"
+                        }
+                        `}
+                      >
+                        {size.size}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
               <span
-                className="
-                text-green-500
-                "
+                className={
+                  selectedSizeOption &&
+                  selectedSizeOption.stock >
+                    0
+                    ? "text-green-500"
+                    : "text-red-400"
+                }
               >
-                In Stock
+                {selectedSizeOption &&
+                selectedSizeOption.stock >
+                  0
+                  ? "In Stock"
+                  : "Out Of Stock"}
               </span>
 
               {" • "}
 
               <span>
                 {
-                  product.stock
+                  selectedSizeOption?.stock ??
+                  0
                 }{" "}
                 available
               </span>
+
+              {selectedSizeOption &&
+                selectedSizeOption.stock >
+                  0 &&
+                selectedSizeOption.stock <=
+                  selectedSizeOption.lowStockThreshold && (
+                  <p className="mt-2 text-sm text-yellow-400">
+                    Low stock for this color and size.
+                  </p>
+                )}
             </div>
 
             <div
@@ -226,11 +406,32 @@ const Product = () => {
               "
             >
               <Button
+                disabled={
+                  !selectedSizeOption ||
+                  selectedSizeOption.stock <=
+                    0
+                }
                 onClick={() => {
+                  if (
+                    !selectedVariant ||
+                    !selectedSizeOption
+                  ) {
+                    return;
+                  }
+
                   addToCart({
-                    id: product._id,
+                    id: `${product._id}-${selectedVariant.color}-${selectedSizeOption.size}`,
+                    productId:
+                      product._id,
                     name: product.name,
-                    price: product.price,
+                    color:
+                      selectedVariant.color,
+                    size:
+                      selectedSizeOption.size,
+                    unitPrice:
+                      selectedSizeOption.price,
+                    price:
+                      selectedSizeOption.price,
                     image:
                       product.images?.[0],
                     quantity: 1,

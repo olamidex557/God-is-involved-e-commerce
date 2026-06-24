@@ -616,7 +616,7 @@ const Dashboard = () => {
                 ) => (
                   <div
                     key={
-                      product._id
+                      `${product.productId}-${product.color}-${product.size}`
                     }
                     className="
                     flex
@@ -629,8 +629,11 @@ const Dashboard = () => {
                   >
                     <span>
                       {
-                        product.name
+                        product.productName
                       }
+                      <span className="block text-sm text-white/45">
+                        {product.color} / {product.size}
+                      </span>
                     </span>
 
                     <span

@@ -16,6 +16,8 @@ export type PaymentStatus =
 export interface OrderItem {
     productId: mongoose.Types.ObjectId;
     name: string;
+    color?: string;
+    size?: string;
     price: number;
     quantity: number;
     image: string;
@@ -60,6 +62,16 @@ const orderItemSchema =
         name: {
             type: String,
             required: true,
+        },
+
+        color: {
+            type: String,
+            default: "Default",
+        },
+
+        size: {
+            type: String,
+            default: "Standard",
         },
 
         price: {

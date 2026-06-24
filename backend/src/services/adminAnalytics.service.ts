@@ -1,5 +1,8 @@
 import Order from "../models/Order";
 import Product from "../models/Product";
+import {
+  getInventoryItems,
+} from "../utils/inventory";
 import User from "../models/User";
 import Quote from "../models/Quote";
 
@@ -230,56 +233,61 @@ export const getAdminAnalytics =
         0
       );
 
+    const inventoryItems =
+      getInventoryItems(
+        products
+      );
+
     const totalProducts =
       products.length;
 
     const healthyProducts =
-      products.filter(
+      inventoryItems.filter(
         (
-          product
+          item
         ) =>
-          product.stock >
-          product.lowStockThreshold
+          item.stock >
+          item.lowStockThreshold
       ).length;
 
     const criticalProducts =
-      products.filter(
+      inventoryItems.filter(
         (
-          product
+          item
         ) =>
-          product.stock > 0 &&
-          product.stock <=
-            product.lowStockThreshold
+          item.stock > 0 &&
+          item.stock <=
+            item.lowStockThreshold
       ).length;
 
     const outOfStockProducts =
-      products.filter(
+      inventoryItems.filter(
         (
-          product
+          item
         ) =>
-          product.stock <= 0
+          item.stock <= 0
       ).length;
 
     const inventoryValue =
-      products.reduce(
+      inventoryItems.reduce(
         (
           total,
-          product
+          item
         ) =>
           total +
-          product.price *
-            product.stock,
+          item.price *
+            item.stock,
         0
       );
 
     const lowStockProducts =
-      products
+      inventoryItems
         .filter(
           (
-            product
+            item
           ) =>
-            product.stock <=
-            product.lowStockThreshold
+            item.stock <=
+            item.lowStockThreshold
         )
         .sort(
           (

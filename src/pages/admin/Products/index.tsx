@@ -4,15 +4,26 @@ import ProductToolbar from "../../../components/admin/products/ProductToolbar";
 import ProductFilters from "../../../components/admin/products/ProductFilters";
 import ProductGrid from "../../../components/admin/products/ProductGrid";
 import CreateProductModal from "../../../components/admin/products/CreateProductModal";
+import EditProductModal from "../../../components/admin/products/EditProductModal";
 
 import { useAdminProducts } from "../../../hooks/products/useAdminProducts";
 import {
   deleteProduct,
 } from "../../../services/api/adminProducts";
+import type {
+  Product,
+} from "../../../types/product";
 
 const ProductsAdmin = () => {
   const [open, setOpen] =
     useState(false);
+
+  const [
+    editingProduct,
+    setEditingProduct,
+  ] = useState<Product | null>(
+    null
+  );
 
   const {
     products,
@@ -112,6 +123,9 @@ const ProductsAdmin = () => {
             onDelete={
               handleDelete
             }
+            onEdit={
+              setEditingProduct
+            }
           />
         )}
       </div>
@@ -122,6 +136,25 @@ const ProductsAdmin = () => {
           setOpen(false)
         }
         onCreated={
+          fetchProducts
+        }
+      />
+
+      <EditProductModal
+        open={
+          Boolean(
+            editingProduct
+          )
+        }
+        product={
+          editingProduct
+        }
+        onClose={() =>
+          setEditingProduct(
+            null
+          )
+        }
+        onUpdated={
           fetchProducts
         }
       />

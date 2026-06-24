@@ -12,6 +12,10 @@ import {
   parseSetStockCommand,
 } from "../utils/productActions";
 import {
+  getInventoryItems,
+  getVariantSizes,
+} from "../utils/inventory";
+import {
   buildDailyOperationsReportMessage,
 } from "./operationsReport.service";
 
@@ -98,6 +102,49 @@ const getProductByName =
     });
   };
 
+type TelegramProduct =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof getProductByName>
+    >
+  >;
+
+const findInventorySize =
+  (
+    product: TelegramProduct
+  ) => {
+    if (
+      !product.variants ||
+      product.variants.length === 0
+    ) {
+      product.variants = [
+        {
+          color: "Default",
+          sizes: [
+            {
+              size: "Standard",
+              price:
+                product.price ?? 0,
+              stock:
+                product.stock ?? 0,
+              lowStockThreshold:
+                product.lowStockThreshold ??
+                10,
+            },
+          ],
+        },
+      ];
+    }
+
+    return {
+      variant:
+        product.variants[0],
+      size:
+        product.variants[0]
+          ?.sizes[0],
+    };
+  };
+
 const formatOrderDetails =
   (
     order: Awaited<ReturnType<typeof Order.findOne>>
@@ -117,7 +164,7 @@ const formatOrderDetails =
               (
                 item
               ) =>
-                `• ${item.name} × ${item.quantity}`
+                `• ${item.name} (${item.color ?? "Default"} / ${item.size ?? "Standard"}) × ${item.quantity}`
             )
             .join("\n")
         : "No products";
@@ -258,14 +305,24 @@ const restockProduct =
       return "Product not found.";
     }
 
-    product.stock +=
+    const {
+      variant,
+      size,
+    } =
+      findInventorySize(
+        product
+      );
+
+    if (!variant || !size) {
+      return "Product has no inventory sizes configured.";
+    }
+
+    size.stock +=
       amount;
-    product.inStock =
-      product.stock > 0;
 
     await product.save();
 
-    return `✅ ${product.name} restocked by ${amount}. Current stock: ${product.stock}.`;
+    return `✅ ${product.name} (${variant.color} / ${size.size}) restocked by ${amount}. Current stock: ${size.stock}.`;
   };
 
 const setProductStock =
@@ -282,14 +339,24 @@ const setProductStock =
       return "Product not found.";
     }
 
-    product.stock =
+    const {
+      variant,
+      size,
+    } =
+      findInventorySize(
+        product
+      );
+
+    if (!variant || !size) {
+      return "Product has no inventory sizes configured.";
+    }
+
+    size.stock =
       stock;
-    product.inStock =
-      stock > 0;
 
     await product.save();
 
-    return `✅ ${product.name} stock set to ${product.stock}.`;
+    return `✅ ${product.name} (${variant.color} / ${size.size}) stock set to ${size.stock}.`;
   };
 
 const showProduct =
@@ -305,6 +372,21 @@ const showProduct =
       return "Product not found.";
     }
 
+    const inventory =
+      getVariantSizes(
+        product
+      );
+
+    const inventoryLines =
+      inventory
+        .map(
+          (
+            item
+          ) =>
+            `• ${item.color} / ${item.size}: ${item.stock} left, threshold ${item.lowStockThreshold}, ${formatCurrency(item.price)}`
+        )
+        .join("\n");
+
     return `
 📦 PRODUCT DETAILS
 
@@ -314,14 +396,8 @@ ${product.name}
 Category:
 ${product.category}
 
-Stock:
-${product.stock}
-
-Low Stock Threshold:
-${product.lowStockThreshold}
-
-Price:
-${formatCurrency(product.price)}
+Inventory:
+${inventoryLines}
 
 In Stock Status:
 ${product.inStock ? "In Stock" : "Out Of Stock"}
@@ -348,35 +424,40 @@ const deleteProduct =
 
 const lowStockReport =
   async () => {
-    const products =
-      await Product.find({
-        stock: {
-          $gt: 0,
-        },
-        $expr: {
-          $lte: [
-            "$stock",
-            "$lowStockThreshold",
-          ],
-        },
-      }).sort({
-        stock: 1,
-        name: 1,
-      });
+    const inventory =
+      getInventoryItems(
+        await Product.find()
+      )
+        .filter(
+          (
+            item
+          ) =>
+            item.stock > 0 &&
+            item.stock <=
+              item.lowStockThreshold
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.stock -
+            b.stock
+        );
 
-    if (products.length === 0) {
+    if (inventory.length === 0) {
       return "✅ No low stock products.";
     }
 
     return `
 ⚠️ LOW STOCK REPORT
 
-${products
+${inventory
   .map(
     (
-      product
+      item
     ) =>
-      `${product.name} - ${product.stock} left (threshold: ${product.lowStockThreshold})`
+      `${item.productName} - ${item.color} / ${item.size}: ${item.stock} left (threshold: ${item.lowStockThreshold})`
   )
   .join("\n")}
 `;
@@ -384,28 +465,39 @@ ${products
 
 const outOfStockReport =
   async () => {
-    const products =
-      await Product.find({
-        stock: {
-          $lte: 0,
-        },
-      }).sort({
-        name: 1,
-      });
+    const inventory =
+      getInventoryItems(
+        await Product.find()
+      )
+        .filter(
+          (
+            item
+          ) =>
+            item.stock <= 0
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.productName.localeCompare(
+              b.productName
+            )
+        );
 
-    if (products.length === 0) {
+    if (inventory.length === 0) {
       return "✅ No out of stock products.";
     }
 
     return `
 🚨 OUT OF STOCK REPORT
 
-${products
+${inventory
   .map(
     (
-      product
+      item
     ) =>
-      product.name
+      `${item.productName} - ${item.color} / ${item.size}`
   )
   .join("\n")}
 `;
@@ -420,8 +512,7 @@ const summary =
       processing,
       delivered,
       cancelled,
-      lowStock,
-      outOfStock,
+      products,
     ] =
       await Promise.all([
         Order.find({
@@ -445,23 +536,31 @@ const summary =
           status:
             "cancelled",
         }),
-        Product.countDocuments({
-          stock: {
-            $gt: 0,
-          },
-          $expr: {
-            $lte: [
-              "$stock",
-              "$lowStockThreshold",
-            ],
-          },
-        }),
-        Product.countDocuments({
-          stock: {
-            $lte: 0,
-          },
-        }),
+        Product.find(),
       ]);
+
+    const inventory =
+      getInventoryItems(
+        products
+      );
+
+    const lowStock =
+      inventory.filter(
+        (
+          item
+        ) =>
+          item.stock > 0 &&
+          item.stock <=
+            item.lowStockThreshold
+      ).length;
+
+    const outOfStock =
+      inventory.filter(
+        (
+          item
+        ) =>
+          item.stock <= 0
+      ).length;
 
     const revenue =
       paidOrders.reduce(
@@ -589,28 +688,35 @@ const stock =
   async () => {
     const [
       totalProducts,
-      lowStock,
-      outOfStock,
+      products,
     ] =
       await Promise.all([
         Product.countDocuments(),
-        Product.countDocuments({
-          stock: {
-            $gt: 0,
-          },
-          $expr: {
-            $lte: [
-              "$stock",
-              "$lowStockThreshold",
-            ],
-          },
-        }),
-        Product.countDocuments({
-          stock: {
-            $lte: 0,
-          },
-        }),
+        Product.find(),
       ]);
+
+    const inventory =
+      getInventoryItems(
+        products
+      );
+
+    const lowStock =
+      inventory.filter(
+        (
+          item
+        ) =>
+          item.stock > 0 &&
+          item.stock <=
+            item.lowStockThreshold
+      ).length;
+
+    const outOfStock =
+      inventory.filter(
+        (
+          item
+        ) =>
+          item.stock <= 0
+      ).length;
 
     return `
 📦 INVENTORY SUMMARY

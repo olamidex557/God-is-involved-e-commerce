@@ -8,11 +8,15 @@ interface Props {
   onDelete: (
     id: string
   ) => void;
+  onEdit: (
+    product: Product
+  ) => void;
 }
 
 const ProductGrid = ({
   products,
   onDelete,
+  onEdit,
 }: Props) => {
   return (
     <div
@@ -29,6 +33,7 @@ const ProductGrid = ({
             key={product._id}
             product={product}
             onDelete={onDelete}
+            onEdit={onEdit}
           />
         )
       )}

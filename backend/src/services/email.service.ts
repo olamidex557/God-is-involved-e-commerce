@@ -167,6 +167,8 @@ export const sendPaymentSuccessfulEmail =
     amount: number,
     items: {
       name: string;
+      color?: string;
+      size?: string;
       quantity: number;
     }[]
   ) => {
@@ -176,7 +178,7 @@ export const sendPaymentSuccessfulEmail =
           (
             item
           ) =>
-            `<li>${item.name} × ${item.quantity}</li>`
+            `<li>${item.name}${item.color || item.size ? ` (${item.color ?? "Default"} / ${item.size ?? "Standard"})` : ""} × ${item.quantity}</li>`
         )
         .join("");
 

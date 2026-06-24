@@ -23,6 +23,16 @@ export const createOrderSchema =
               z
                 .string()
                 .optional(),
+            color:
+              z
+                .string()
+                .trim()
+                .optional(),
+            size:
+              z
+                .string()
+                .trim()
+                .optional(),
             price:
               z
                 .number()

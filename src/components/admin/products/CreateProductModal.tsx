@@ -6,6 +6,11 @@ import {
 
 import MultipleImageUploader
   from "../uploads/MultipleImageUploader";
+import VariantBuilder
+  from "./VariantBuilder";
+import type {
+  ProductVariant,
+} from "../../../types/product";
 
 interface Props {
   open: boolean;
@@ -13,11 +18,95 @@ interface Props {
   onCreated: () => void;
 }
 
+const slugify = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const validateVariants = (
+  variants: ProductVariant[]
+) => {
+  if (variants.length === 0) {
+    return "Add at least one color.";
+  }
+
+  const colors = new Set<string>();
+
+  for (const variant of variants) {
+    const color =
+      variant.color.trim();
+
+    if (!color) {
+      return "Every color must have a name.";
+    }
+
+    const colorKey =
+      color.toLowerCase();
+
+    if (colors.has(colorKey)) {
+      return "Duplicate colors are not allowed.";
+    }
+
+    colors.add(colorKey);
+
+    if (variant.sizes.length === 0) {
+      return `${color} must include at least one size.`;
+    }
+
+    const sizes = new Set<string>();
+
+    for (const size of variant.sizes) {
+      const label =
+        size.size.trim();
+
+      if (!label) {
+        return `Every size under ${color} must have a name.`;
+      }
+
+      const sizeKey =
+        label.toLowerCase();
+
+      if (sizes.has(sizeKey)) {
+        return `Duplicate sizes are not allowed under ${color}.`;
+      }
+
+      sizes.add(sizeKey);
+
+      if (
+        size.price < 0 ||
+        size.stock < 0 ||
+        size.lowStockThreshold < 0
+      ) {
+        return "Price, stock and threshold must be zero or greater.";
+      }
+    }
+  }
+
+  return "";
+};
+
 const CreateProductModal = ({
   open,
   onClose,
   onCreated,
 }: Props) => {
+  const defaultVariants:
+    ProductVariant[] = [
+      {
+        color: "Default",
+        sizes: [
+          {
+            size: "Standard",
+            price: 0,
+            stock: 0,
+            lowStockThreshold: 10,
+          },
+        ],
+      },
+    ];
+
   const [
     loading,
     setLoading,
@@ -29,10 +118,13 @@ const CreateProductModal = ({
       slug: "",
       description: "",
       category: "",
-      price: "",
-      stock: "",
       images: [] as string[],
+      variants:
+        defaultVariants,
     });
+
+  const [error, setError] =
+    useState("");
 
   if (!open) return null;
 
@@ -42,10 +134,25 @@ const CreateProductModal = ({
       HTMLTextAreaElement
     >
   ) => {
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.value,
+    setForm((previous) => {
+      const next = {
+        ...previous,
+        [e.target.name]:
+          e.target.value,
+      };
+
+      if (
+        e.target.name ===
+          "name" &&
+        previous.slug.trim() === ""
+      ) {
+        next.slug =
+          slugify(
+            e.target.value
+          );
+      }
+
+      return next;
     });
   };
 
@@ -54,18 +161,30 @@ const CreateProductModal = ({
       e: React.FormEvent
     ) => {
       e.preventDefault();
+      setError("");
 
       try {
         setLoading(true);
-
-        console.log("FORM:", form);
 
         if (
           form.images.length ===
           0
         ) {
-          alert(
-            "Upload at least one image"
+          setError(
+            "Upload at least one image."
+          );
+
+          return;
+        }
+
+        const variantError =
+          validateVariants(
+            form.variants
+          );
+
+        if (variantError) {
+          setError(
+            variantError
           );
 
           return;
@@ -73,12 +192,13 @@ const CreateProductModal = ({
 
         await createProduct({
           ...form,
-          price: Number(
-            form.price
-          ),
-          stock: Number(
-            form.stock
-          ),
+          slug:
+            form.slug.trim() ||
+            slugify(
+              form.name
+            ),
+          variants:
+            form.variants,
           images:
             form.images,
         });
@@ -92,15 +212,18 @@ const CreateProductModal = ({
           slug: "",
           description: "",
           category: "",
-          price: "",
-          stock: "",
           images: [],
+          variants:
+            defaultVariants,
         });
       } catch (
       error
       ) {
-        console.error(
+          console.error(
           error
+        );
+        setError(
+          "Product could not be created. Check the details and try again."
         );
       } finally {
         setLoading(false);
@@ -123,7 +246,9 @@ const CreateProductModal = ({
       <div
         className="
         w-full
-        max-w-2xl
+        max-w-4xl
+        max-h-[90vh]
+        overflow-y-auto
         bg-[#111]
         border
         border-white/10
@@ -150,7 +275,7 @@ const CreateProductModal = ({
           <button
             onClick={onClose}
           >
-            ✕
+            x
           </button>
         </div>
 
@@ -213,38 +338,22 @@ const CreateProductModal = ({
             "
           />
 
-          <input
-            name="price"
-            placeholder="Price"
-            value={
-              form.price
+          <VariantBuilder
+            variants={
+              form.variants
             }
-            onChange={
-              handleChange
+            onChange={(
+              variants
+            ) =>
+              setForm(
+                (
+                  prev
+                ) => ({
+                  ...prev,
+                  variants,
+                })
+              )
             }
-            className="
-            w-full
-            p-4
-            rounded-xl
-            bg-white/5
-            "
-          />
-
-          <input
-            name="stock"
-            placeholder="Stock"
-            value={
-              form.stock
-            }
-            onChange={
-              handleChange
-            }
-            className="
-            w-full
-            p-4
-            rounded-xl
-            bg-white/5
-            "
           />
 
           <MultipleImageUploader
@@ -282,6 +391,12 @@ const CreateProductModal = ({
             "
           />
 
+          {error && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={
@@ -289,6 +404,8 @@ const CreateProductModal = ({
               !form.name ||
               !form.category ||
               !form.description ||
+              form.variants
+                .length === 0 ||
               form.images
                 .length === 0
             }

@@ -23,6 +23,10 @@ interface ProductFilter {
     $gte?: number;
     $lte?: number;
   };
+  $and?: Record<
+    string,
+    unknown
+  >[];
 }
 
 const getQueryString =
@@ -78,6 +82,94 @@ const escapeRegex =
       /[.*+?^${}()|[\]\\]/g,
       "\\$&"
     );
+
+const slugify = (
+  value: string
+) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const normalizeProductPayload =
+  (
+    body: Record<
+      string,
+      unknown
+    >
+  ) => {
+    const next = {
+      ...body,
+    };
+
+    if (
+      typeof next.slug !==
+        "string" ||
+      next.slug.trim() === ""
+    ) {
+      if (
+        typeof next.name ===
+          "string" &&
+        next.name.trim() !== ""
+      ) {
+        next.slug = slugify(
+          next.name
+        );
+      }
+    } else {
+      next.slug = slugify(
+        next.slug
+      );
+    }
+
+    return next;
+  };
+
+const sendProductError =
+  (
+    error: unknown,
+    res: Response,
+    fallbackMessage: string
+  ) => {
+    console.error(error);
+
+    if (
+      typeof error ===
+        "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    ) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "A product with this slug already exists",
+      });
+    }
+
+    if (
+      typeof error ===
+        "object" &&
+      error !== null &&
+      "name" in error &&
+      error.name ===
+        "ValidationError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Validation failed",
+        error,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message:
+        fallbackMessage,
+    });
+  };
 
 export const getProducts = async (
   req: Request,
@@ -183,8 +275,22 @@ export const getProducts = async (
         priceFilter
       ).length > 0
     ) {
-      filter.price =
-        priceFilter;
+      filter.$and = [
+        ...(filter.$and ??
+          []),
+        {
+          $or: [
+            {
+              price:
+                priceFilter,
+            },
+            {
+              "variants.sizes.price":
+                priceFilter,
+            },
+          ],
+        },
+      ];
     }
 
     const sortOption:
@@ -226,20 +332,26 @@ export const createProduct = async (
   res: Response
 ) => {
   try {
+    const payload =
+      normalizeProductPayload(
+        req.body
+      );
+
     const product =
-      await Product.create(req.body);
+      await Product.create(
+        payload
+      );
 
     res.status(201).json({
       success: true,
       product,
     });
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
+    sendProductError(
       error,
-    });
+      res,
+      "Failed to create product"
+    );
   }
 };
 
@@ -282,12 +394,8 @@ export const updateProduct = async (
 ) => {
   try {
     const product =
-      await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-        }
+      await Product.findById(
+        req.params.id
       );
 
     if (!product) {
@@ -298,18 +406,24 @@ export const updateProduct = async (
       });
     }
 
+    product.set(
+      normalizeProductPayload(
+        req.body
+      )
+    );
+
+    await product.save();
+
     res.json({
       success: true,
       product,
     });
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message:
-        "Server Error",
-    });
+    sendProductError(
+      error,
+      res,
+      "Failed to update product"
+    );
   }
 };
 
@@ -320,18 +434,15 @@ export const updateProductStock =
   ) => {
     try {
       const {
+        color,
+        size,
         stock,
+        lowStockThreshold,
       } = req.body;
 
       const product =
-        await Product.findByIdAndUpdate(
-          req.params.id,
-          {
-            stock,
-          },
-          {
-            new: true,
-          }
+        await Product.findById(
+          req.params.id
         );
 
       if (!product) {
@@ -341,6 +452,96 @@ export const updateProductStock =
             "Product not found",
         });
       }
+
+      const targetColor =
+        typeof color ===
+        "string"
+          ? color.trim()
+          : "Default";
+
+      const targetSize =
+        typeof size ===
+        "string"
+          ? size.trim()
+          : "Standard";
+
+      const variant =
+        product.variants.find(
+          (
+            productVariant
+          ) =>
+            productVariant.color.toLowerCase() ===
+            targetColor.toLowerCase()
+        );
+
+      const sizeOption =
+        variant?.sizes.find(
+          (
+            productSize
+          ) =>
+            productSize.size.toLowerCase() ===
+            targetSize.toLowerCase()
+        );
+
+      if (
+        !variant ||
+        !sizeOption
+      ) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Variant size not found",
+        });
+      }
+
+      const parsedStock =
+        Number(
+          stock
+        );
+
+      if (
+        !Number.isFinite(
+          parsedStock
+        ) ||
+        parsedStock < 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "stock must be a non-negative number",
+        });
+      }
+
+      sizeOption.stock =
+        parsedStock;
+
+      if (
+        lowStockThreshold !==
+        undefined
+      ) {
+        const parsedThreshold =
+          Number(
+            lowStockThreshold
+          );
+
+        if (
+          !Number.isFinite(
+            parsedThreshold
+          ) ||
+          parsedThreshold < 0
+        ) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "lowStockThreshold must be a non-negative number",
+          });
+        }
+
+        sizeOption.lowStockThreshold =
+          parsedThreshold;
+      }
+
+      await product.save();
 
       res.json({
         success: true,

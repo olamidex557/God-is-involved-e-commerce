@@ -31,6 +31,8 @@ interface CreateOrderItemInput {
   productId: string;
   name?: string;
   image?: string;
+  color?: string;
+  size?: string;
   quantity: number;
 }
 
@@ -98,31 +100,101 @@ export const createOrder =
             });
         }
 
+        const targetColor =
+          typeof item.color ===
+          "string" &&
+          item.color.trim()
+            ? item.color.trim()
+            : "Default";
+
+        const targetSize =
+          typeof item.size ===
+          "string" &&
+          item.size.trim()
+            ? item.size.trim()
+            : "Standard";
+
         if (
-          product.stock <= 0
+          !product.variants ||
+          product.variants.length ===
+            0
+        ) {
+          product.variants = [
+            {
+              color:
+                "Default",
+              sizes: [
+                {
+                  size:
+                    "Standard",
+                  price:
+                    product.price ?? 0,
+                  stock:
+                    product.stock ?? 0,
+                  lowStockThreshold:
+                    product.lowStockThreshold ??
+                    10,
+                },
+              ],
+            },
+          ];
+        }
+
+        const variant =
+          product.variants.find(
+            (
+              productVariant
+            ) =>
+              productVariant.color.toLowerCase() ===
+              targetColor.toLowerCase()
+          );
+
+        const sizeOption =
+          variant?.sizes.find(
+            (
+              productSize
+            ) =>
+              productSize.size.toLowerCase() ===
+              targetSize.toLowerCase()
+          );
+
+        if (
+          !variant ||
+          !sizeOption
         ) {
           return res
             .status(400)
             .json({
               success: false,
-              message: `${product.name} is out of stock`,
+              message: `${product.name} is not available in ${targetColor} / ${targetSize}`,
             });
         }
 
         if (
-          product.stock <
+          sizeOption.stock <= 0
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message: `${product.name} (${targetColor} / ${targetSize}) is out of stock`,
+            });
+        }
+
+        if (
+          sizeOption.stock <
           item.quantity
         ) {
           return res
             .status(400)
             .json({
               success: false,
-              message: `Only ${product.stock} unit(s) of ${product.name} available`,
+              message: `Only ${sizeOption.stock} unit(s) of ${product.name} (${targetColor} / ${targetSize}) available`,
             });
         }
 
         calculatedSubtotal +=
-          product.price *
+          sizeOption.price *
           item.quantity;
 
         orderItems.push({
@@ -130,8 +202,12 @@ export const createOrder =
             product._id,
           name:
             product.name,
+          color:
+            variant.color,
+          size:
+            sizeOption.size,
           price:
-            product.price,
+            sizeOption.price,
           quantity:
             item.quantity,
           image:
@@ -189,32 +265,60 @@ export const createOrder =
           );
 
         if (product) {
-          product.stock =
-            product.stock -
-            item.quantity;
+          const variant =
+            product.variants.find(
+              (
+                productVariant
+              ) =>
+                productVariant.color.toLowerCase() ===
+                (
+                  item.color ??
+                  "Default"
+                ).toLowerCase()
+            );
 
-          product.inStock =
-            product.stock > 0;
+          const sizeOption =
+            variant?.sizes.find(
+              (
+                productSize
+              ) =>
+                productSize.size.toLowerCase() ===
+                (
+                  item.size ??
+                  "Standard"
+                ).toLowerCase()
+            );
+
+          if (!sizeOption) {
+            continue;
+          }
+
+          sizeOption.stock =
+            Math.max(
+              0,
+              sizeOption.stock -
+                item.quantity
+            );
 
           await product.save();
 
           try {
             if (
-              product.stock === 0
+              sizeOption.stock === 0
             ) {
               await sendTelegramMessage(
                 formatOutOfStockAlert(
-                  product.name
+                  `${product.name} (${item.color ?? "Default"} / ${item.size ?? "Standard"})`
                 )
               );
             } else if (
-              product.stock <=
-              product.lowStockThreshold
+              sizeOption.stock <=
+              sizeOption.lowStockThreshold
             ) {
               await sendTelegramMessage(
                 formatLowStockAlert(
-                  product.name,
-                  product.stock
+                  `${product.name} (${item.color ?? "Default"} / ${item.size ?? "Standard"})`,
+                  sizeOption.stock
                 )
               );
             }
@@ -251,6 +355,10 @@ export const createOrder =
               ) => ({
                 name:
                   item.name,
+                color:
+                  item.color,
+                size:
+                  item.size,
                 quantity:
                   item.quantity,
               })

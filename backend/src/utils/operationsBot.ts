@@ -5,6 +5,8 @@ export const formatNewOrderAlert =
     amount: number,
     items: {
       name: string;
+      color?: string;
+      size?: string;
       quantity: number;
     }[]
   ) => {
@@ -14,7 +16,7 @@ export const formatNewOrderAlert =
           (
             item
           ) =>
-            `• ${item.name} × ${item.quantity}`
+            `• ${item.name}${item.color || item.size ? ` (${item.color ?? "Default"} / ${item.size ?? "Standard"})` : ""} × ${item.quantity}`
         )
         .join("\n");
 
@@ -73,6 +75,8 @@ export const formatPaymentReceivedAlert =
     amount: number,
     items: {
       name: string;
+      color?: string;
+      size?: string;
       quantity: number;
     }[]
   ) => {
@@ -82,7 +86,7 @@ export const formatPaymentReceivedAlert =
           (
             item
           ) =>
-            `• ${item.name} × ${item.quantity}`
+            `• ${item.name}${item.color || item.size ? ` (${item.color ?? "Default"} / ${item.size ?? "Standard"})` : ""} × ${item.quantity}`
         )
         .join("\n");
 

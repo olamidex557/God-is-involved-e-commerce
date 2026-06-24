@@ -3,7 +3,11 @@ import { persist } from "zustand/middleware";
 
 interface CartItem {
   id: string;
+  productId: string;
   name: string;
+  color: string;
+  size: string;
+  unitPrice: number;
   price: number;
   image?: string;
   quantity: number;
@@ -38,10 +42,33 @@ export const useCartStore =
           item
         ) =>
           set((state) => {
+            const normalizedItem =
+              {
+                ...item,
+                productId:
+                  item.productId ??
+                  item.id,
+                id:
+                  item.id ||
+                  `${item.productId}-${item.color}-${item.size}`,
+                color:
+                  item.color ??
+                  "Default",
+                size:
+                  item.size ??
+                  "Standard",
+                unitPrice:
+                  item.unitPrice ??
+                  item.price,
+                price:
+                  item.price ??
+                  item.unitPrice,
+              };
+
             const existing =
               state.items.find(
                 (i) =>
-                  i.id === item.id
+                  i.id === normalizedItem.id
               );
 
             if (existing) {
@@ -49,12 +76,12 @@ export const useCartStore =
                 items:
                   state.items.map(
                     (i) =>
-                      i.id === item.id
+                      i.id === normalizedItem.id
                         ? {
                             ...i,
                             quantity:
                               i.quantity +
-                              1,
+                              normalizedItem.quantity,
                           }
                         : i
                   ),
@@ -64,7 +91,7 @@ export const useCartStore =
             return {
               items: [
                 ...state.items,
-                item,
+                normalizedItem,
               ],
             };
           }),

@@ -3,6 +3,10 @@ export interface OrderItem {
 
   name: string;
 
+  color?: string;
+
+  size?: string;
+
   price: number;
 
   quantity: number;
@@ -69,6 +73,8 @@ export interface CreateOrderPayload {
   items: {
     productId: string;
     name: string;
+    color?: string;
+    size?: string;
     price: number;
     quantity: number;
     image: string;

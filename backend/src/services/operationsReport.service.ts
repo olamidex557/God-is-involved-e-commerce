@@ -3,6 +3,9 @@ import Product from "../models/Product";
 import {
   sendTelegramMessage,
 } from "./telegram.service";
+import {
+  getInventoryItems,
+} from "../utils/inventory";
 
 const formatCurrency =
   (
@@ -26,8 +29,7 @@ export const getOperationsReport =
       orders,
       pending,
       delivered,
-      lowStock,
-      outOfStock,
+      products,
     ] =
       await Promise.all([
         Order.find({
@@ -43,23 +45,31 @@ export const getOperationsReport =
           status:
             "delivered",
         }),
-        Product.countDocuments({
-          stock: {
-            $gt: 0,
-          },
-          $expr: {
-            $lte: [
-              "$stock",
-              "$lowStockThreshold",
-            ],
-          },
-        }),
-        Product.countDocuments({
-          stock: {
-            $lte: 0,
-          },
-        }),
+        Product.find(),
       ]);
+
+    const inventoryItems =
+      getInventoryItems(
+        products
+      );
+
+    const lowStock =
+      inventoryItems.filter(
+        (
+          item
+        ) =>
+          item.stock > 0 &&
+          item.stock <=
+            item.lowStockThreshold
+      ).length;
+
+    const outOfStock =
+      inventoryItems.filter(
+        (
+          item
+        ) =>
+          item.stock <= 0
+      ).length;
 
     const revenue =
       paidOrders.reduce(
